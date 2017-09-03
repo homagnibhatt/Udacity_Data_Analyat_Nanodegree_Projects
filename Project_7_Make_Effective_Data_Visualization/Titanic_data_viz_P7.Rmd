@@ -1,0 +1,46 @@
+---
+title: "titanic_data_new_viz"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+
+```{r setup, include=FALSE}
+
+# Set the working directory
+setwd("E:/Documents/Data Science/UDACITY_Data Analyst Nanodegree/Core/7. Data Visualization/9. Project- make effective visualization/Project_HB_data_viz")
+
+### Reading in Data
+titanic_data_new <- read.csv('titanic_data.csv')
+
+### Subseting Survived
+titanic_data_new <- subset(titanic_data, Survived != ",")
+titanic_data_new <- subset(titanic_data, Survived == 1)
+
+### Changing factor levels
+titanic_data_new$Pclass[titanic_data_new$Pclass == 1] <- 'First Class'
+titanic_data_new$Pclass[titanic_data_new$Pclass == 2] <- 'Second Class'
+titanic_data_new$Pclass[titanic_data_new$Pclass == 3] <- 'Third Class'
+
+levels(titanic_data_new$Embarked)[match("C",levels(titanic_data_new$Embarked))] <- 'Cherbourg'
+levels(titanic_data_new$Embarked)[match("Q",levels(titanic_data_new$Embarked))] <- 'Queenstown'
+levels(titanic_data_new$Embarked)[match("S",levels(titanic_data_new$Embarked))] <- "Southampton"
+
+#Omit NA
+titanic_data_new <-na.omit(titanic_data_new) # removing NA
+
+## Subsetting for only important columns
+titanic_data_new <- titanic_data_new[,c( 2, 3, 5, 6, 10, 12)]
+
+head(titanic_data_new)## checking changes made
+
+# Write CSV in R
+write.csv(titanic_data_new, file = "titanic_data_1.csv")
+
+
+```
+
