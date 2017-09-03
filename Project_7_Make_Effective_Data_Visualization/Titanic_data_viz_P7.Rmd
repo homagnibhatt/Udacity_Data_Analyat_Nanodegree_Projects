@@ -17,11 +17,14 @@ setwd("E:/Documents/Data Science/UDACITY_Data Analyst Nanodegree/Core/7. Data Vi
 ### Reading in Data
 titanic_data_new <- read.csv('titanic_data.csv')
 
-### Subseting Survived
-titanic_data_new <- subset(titanic_data, Survived != ",")
-titanic_data_new <- subset(titanic_data, Survived == 1)
+### Subseting
+titanic_data_new <- subset(titanic_data_new, Embarked == "C" | Embarked == "Q" | Embarked ==  "S")
+
 
 ### Changing factor levels
+titanic_data_new$Survived[titanic_data_new$Survived == 1] <- 'Survived'
+titanic_data_new$Survived[titanic_data_new$Survived == 0] <- 'Deceased'
+
 titanic_data_new$Pclass[titanic_data_new$Pclass == 1] <- 'First Class'
 titanic_data_new$Pclass[titanic_data_new$Pclass == 2] <- 'Second Class'
 titanic_data_new$Pclass[titanic_data_new$Pclass == 3] <- 'Third Class'
@@ -36,11 +39,8 @@ titanic_data_new <-na.omit(titanic_data_new) # removing NA
 ## Subsetting for only important columns
 titanic_data_new <- titanic_data_new[,c( 2, 3, 5, 6, 10, 12)]
 
-head(titanic_data_new)## checking changes made
-
 # Write CSV in R
 write.csv(titanic_data_new, file = "titanic_data_1.csv")
-
 
 ```
 
