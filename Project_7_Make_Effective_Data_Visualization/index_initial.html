@@ -35,12 +35,12 @@ Now we will dive into the visualization.
 </pre>
 
 <div id="chartContainer">
-  <script src="/lib/d3.v4.3.0.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="http://dimplejs.org/dist/dimple.v2.3.0.min.js"></script>
   <script type="text/javascript">
     // A vertical grouped stacked 100% bar plot
     var svg = dimple.newSvg("#chartContainer", 590, 400);
-    d3.tsv("titanic_data_1.csv", function (data) {
+    d3.csv("titanic_data_1.csv", function (data) {
       var myChart = new dimple.chart(svg, data);
       myChart.setBounds(65, 45, 505, 315)
       var x = myChart.addCategoryAxis("x", ["Pclass", "Sex"]);
