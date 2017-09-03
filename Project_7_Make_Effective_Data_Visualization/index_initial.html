@@ -42,9 +42,9 @@ Now we will dive into the visualization.
     d3.csv("titanic_data_1.csv", function (data) {
       var myChart = new dimple.chart(svg, data);
       myChart.setBounds(65, 45, 505, 315)
-      var x = myChart.addCategoryAxis("x", ["Pclass", "Sex"]);
+      var x = myChart.addCategoryAxis("x", ["Pclass" , "Sex"]);
       var y = myChart.addPctAxis("y", "Survived");
-      var s = myChart.addSeries("Survived", dimple.plot.bar);
+      var s = myChart.addSeries("Embarked", dimple.plot.bar);
       
       s.afterDraw = function (shape, data) {
         // Get the shape as a d3 selection
