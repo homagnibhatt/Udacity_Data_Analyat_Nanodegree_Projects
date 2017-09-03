@@ -25,11 +25,10 @@ Below is a brief information about each columns of the dataset:
 
 <h2>Data Cleaning</h2>
 Although the dataset is fairly cleaned, some preliminary cleaning was performed using R. The following steps were taken:
-•	Removing rows with NA and blank values so that a complete dataset was used.	
-•	Since we are interested in looking into the survivors and the factors which influence it, we will only use data where Survived = 1 i.e. only those data points where the passenger survived
-•	Now we will make a preliminary observation in the dataset. Hence, we will look into only a limited number of variable and its interplay with survival.
-•	For this reason we only use the following variables: Survived, PClass, Sex, Age, Fare, Embarked
-
+1.	Removing rows with NA and blank values so that a complete dataset was used.
+2.	Since we are interested in looking into the survivors and the factors which influence it, we will only use data where Survived = 1 i.e. only those data points where the passenger survived.
+3.	Now we will make a preliminary observation in the dataset. Hence, we will look into only a limited number of variable and its interplay with survival.
+4.	For this reason we only use the following variables: Survived, PClass, Sex, Age, Fare, Embarked
 
 Now we will dive into the visualization.
 </pre>
@@ -43,12 +42,28 @@ Now we will dive into the visualization.
     d3.csv("titanic_data_1.csv", function (data) {
       var myChart = new dimple.chart(svg, data);
       myChart.setBounds(65, 45, 505, 315)
-      myChart.addCategoryAxis("x", ["Pclass" , "Sex"]);
-      myChart.addMeasureAxis("y", "Survived");
-      myChart.addSeries("Embarked", dimple.plot.bar);
+      var x= myChart.addCategoryAxis("x", ["Pclass" , "Sex"]);
+      var y= myChart.addMeasureAxis("y", "Survived");
+      var s= myChart.addSeries("Embarked", dimple.plot.bar);
+	  x.addOrderRule("PClass", false);
       myChart.addLegend(200, 10, 380, 20, "right");
       myChart.draw();
     });
   </script>
 </div>
+
+
+<body>
+<h2>Data Visualization Insights</h2>
+
+1.	Overall, First class passengers have the highest number of survivors followed by Second and Third class respectively.	
+
+2.	In all classes, the women have better suvivability than men accross all ages.
+
+3.	Interestingly, highest number of survivors are from Southampton followed by Cherbourg and only marginal survivors from Queenstown accross all classes.
+
+4.	Hence, we can infer that there is a greater chance for female passengers from Southampton belonging to high socio-economic status to have survived the Titanic disaster
+
+</body>
+
 </html>
