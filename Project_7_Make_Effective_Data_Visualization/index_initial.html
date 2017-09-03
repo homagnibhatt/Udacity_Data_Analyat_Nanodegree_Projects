@@ -37,48 +37,17 @@ Now we will dive into the visualization.
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="http://dimplejs.org/dist/dimple.v2.3.0.min.js"></script>
   <script type="text/javascript">
-    // A vertical grouped stacked 100% bar plot
+    // A vertical grouped stacked bar plot
     var svg = dimple.newSvg("#chartContainer", 590, 400);
     d3.csv("titanic_data_1.csv", function (data) {
       var myChart = new dimple.chart(svg, data);
       myChart.setBounds(65, 45, 505, 315)
-      var x = myChart.addCategoryAxis("x", ["Pclass" , "Sex"]);
-      var y = myChart.addPctAxis("y", "Survived");
-      var s = myChart.addSeries("Embarked", dimple.plot.bar);
-      
-      s.afterDraw = function (shape, data) {
-        // Get the shape as a d3 selection
-        var s = d3.select(shape),
-          rect = {
-            x: parseFloat(s.attr("x")),
-            y: parseFloat(s.attr("y")),
-            width: parseFloat(s.attr("width")),
-            height: parseFloat(s.attr("height"))
-          };
-        // Only label bars where the text can fit
-        if (rect.height >= 8) {
-          // Add a text label for the value
-          svg.append("text")
-            // Position in the centre of the shape (vertical position is
-            // manually set due to cross-browser problems with baseline)
-            .attr("x", rect.x + rect.width / 2)
-            .attr("y", rect.y + rect.height / 2 + 3.5)
-            // Centre align
-            .style("text-anchor", "middle")
-            .style("font-size", "10px")
-            .style("font-family", "sans-serif")
-            // Make it a little transparent to tone down the black
-            .style("opacity", 0.6)
-            // Prevent text cursor on hover and allow tooltips
-            .style("pointer-events", "none")
-            // Format the number
-            .text(d3.format(",.1f")(data.yValue / 1000) + "k");
-        }
-      };
+      myChart.addCategoryAxis("x", ["Pclass" , "Sex"]);
+      myChart.addMeasureAxis("y", "Survived");
+      myChart.addSeries("Embarked", dimple.plot.bar);
       myChart.addLegend(200, 10, 380, 20, "right");
       myChart.draw();
     });
   </script>
 </div>
 </html>
-
