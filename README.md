@@ -43,7 +43,7 @@ The following points can bee seen:
 3. Interestingly, highest number of survivors are from Southampton followed by Cherbourg and only marginal survivors from Queenstown accross all classes. 
 4.Hence, we can infer that there is a greater chance for female passengers from Southampton belonging to high socio-economic status to have survived the Titanic disaster.
 
-Following the feedback, some more changes were done which was incorporated in index_final.html
+Some more changes were done to improve the cart which was incorporated in index_final.html
 
 The following changes were done:
 
