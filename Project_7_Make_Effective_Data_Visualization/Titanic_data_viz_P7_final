@@ -1,5 +1,5 @@
 ---
-title: "Titanic_data_viz"
+title: "titanic_data_new_viz"
 output: html_document
 ---
 
@@ -11,34 +11,41 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```{r setup, include=FALSE}
 
-getwd()
-
+# Set the working directory
+ setwd("E:/Documents/Data Science/UDACITY_Data Analyst Nanodegree/Core/7. Data Visualization/9. Project- make effective visualization/Project_HB_data_viz")
+ 
 ### Reading in Data
-prosper_data <- read.csv('P5_prosperLoanData.csv')
+titanic_data_new <- read.csv('titanic_data.csv')
 
-#Structure of dataframe
-str(prosper_data)
+### Subseting 
+titanic_data_new <- subset(titanic_data, Survived == 1)
+titanic_data_new <- subset(titanic_data_new, Embarked == "C" | Embarked == "Q" | Embarked ==  "S")
 
-# Some example data
-titanic_data <- data.frame(age_mnth = 1:170)
-# Your way of doing things to compare against
-rota2$age_gr<-ifelse(rota2$age_mnth<6,rr2<-"0-5 mnths",
-                     ifelse(rota2$age_mnth>5&rota2$age_mnth<12,rr2<-"6-11 mnths",
-                            ifelse(rota2$age_mnth>11&rota2$age_mnth<24,rr2<-"12-23 mnths",
-                                   ifelse(rota2$age_mnth>23&rota2$age_mnth<60,rr2<-"24-59 mnths",
-                                          ifelse(rota2$age_mnth>59&rota2$age_mnth<167,rr2<-"5-14 yrs",
-                                                 rr2<-"adult")))))
+### Changing factor levels
+titanic_data_new$Pclass[titanic_data_new$Pclass == 1] <- 'First Class'
+titanic_data_new$Pclass[titanic_data_new$Pclass == 2] <- 'Second Class'
+titanic_data_new$Pclass[titanic_data_new$Pclass == 3] <- 'Third Class'
+
+levels(titanic_data_new$Embarked)[match("C",levels(titanic_data_new$Embarked))] <- 'Cherbourg'
+levels(titanic_data_new$Embarked)[match("Q",levels(titanic_data_new$Embarked))] <- 'Queenstown'
+levels(titanic_data_new$Embarked)[match("S",levels(titanic_data_new$Embarked))] <- "Southampton"
+
+#Omit NA
+titanic_data_new <-na.omit(titanic_data_new) # removing NA
+
+## Subsetting for only important columns
+titanic_data_new <- titanic_data_new[,c( 2, 3, 5, 6, 10, 12)]
+
 
 # Using cut
-rota2$age_grcut <- cut(rota2$age_mnth, 
-                       breaks = c(-Inf, 6, 12, 24, 60, 167, Inf), 
-                       labels = c("0-5 mnths", "6-11 mnths", "12-23 mnths", "24-59 mnths", "5-14 yrs", "adult"), 
+Age_Bucket <- cut(titanic_data_new$Age, 
+                       breaks = c(-Inf, 19, 41, 61, Inf), 
+                       labels = c("Children (0-18)", "Young (19-40)","Middle-Aged (41-60)", "Senior-Citizen   (61-above)"), 
                        right = FALSE)
 
-### Reading in Data
-prosper_data <- read.csv('P5_prosperLoanData.csv')
+head(titanic_data_new)## checking changes made
 
-#Structure of dataframe
-str(prosper_data)
+# Write CSV in R
+write.csv(titanic_data_new, file = "titanic_data_1.csv")
+
 ```
-
