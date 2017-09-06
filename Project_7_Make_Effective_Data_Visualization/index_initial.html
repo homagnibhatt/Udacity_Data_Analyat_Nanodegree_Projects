@@ -1,43 +1,9 @@
-
 <html>
-
-<pre> <h1>Titanic Data Visualization Project</h1>
-On April 15, 1912, during her maiden voyage, the Titanic sank after colliding with an iceberg, killing 1502 out of 2224 passengers and crew. 
-One of the reasons that the shipwreck led to such loss of life was that there were not enough lifeboats for the passengers and crew. 
-Although there was some element of luck involved in surviving the sinking, some groups of people were more likely to survive than others, such as women, upper-class etc. 
-The purpose of this project is to identify the various groups who were likely to survive. 
-This dataset was obtained from the Kaggle website. The training dataset was used.
-
-<h2>Description of the data</h2>
-Below is a brief information about each columns of the dataset:
-1.	PassengerId: An unique index for passenger rows. It starts from 1 for first row and increments by 1 for every new rows.
-2.	Survived: Shows if the passenger survived or not. 1 stands for survived and 0 stands for not survived.
-3.	Pclass: Ticket class. 1 stands for First class ticket. 2 stands for Second class ticket. 3 stands for Third class ticket.
-4.	Name: Passenger's name. Name also contain title. "Mr" for man. "Mrs" for woman. "Miss" for girl. "Master" for boy.
-5.	Sex: Passenger's sex. It's either Male or Female.
-6.	Age: Passenger's age. "NaN" values in this column indicates that the age of that particular passenger has not been recorded.
-7.	SibSp: Number of siblings or spouses travelling with each passenger.
-8.	Parch: Number of parents of children travelling with each passenger.
-9.	Ticket: Ticket number.
-10.	Fare: How much money the passenger has paid for the travel journey.
-11.	Cabin: Cabin number of the passenger. "NaN" values in this column indicates that the cabin number of that particular passenger has not been recorded.
-12.	Embarked: Port from where the particular passenger was embarked/boarded.
-
-<h2>Data Cleaning</h2>
-Although the dataset is fairly cleaned, some preliminary cleaning was performed using R. The following steps were taken:
-1.	Removing rows with NA and blank values so that a complete dataset was used.
-2.	Since we are interested in looking into the survivors and the factors which influence it, we will only use data where Survived = 1 i.e. only those data points where the passenger survived.
-3.	Now we will make a preliminary observation in the dataset. Hence, we will look into only a limited number of variable and its interplay with survival.
-4.	For this reason we only use the following variables: Survived, PClass, Sex, Age, Fare, Embarked
-
-Now we will dive into the visualization.
-</pre>
-
 <div id="chartContainer">
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="http://dimplejs.org/dist/dimple.v2.3.0.min.js"></script>
   <script type="text/javascript">
-    // A vertical grouped stacked bar plot
+    // A vertical grouped stacked  plot
     var svg = dimple.newSvg("#chartContainer", 590, 400);
     d3.csv("titanic_data_1.csv", function (data) {
       var myChart = new dimple.chart(svg, data);
@@ -45,25 +11,10 @@ Now we will dive into the visualization.
       var x= myChart.addCategoryAxis("x", ["Pclass" , "Sex"]);
       var y= myChart.addMeasureAxis("y", "Survived");
       var s= myChart.addSeries("Embarked", dimple.plot.bar);
-	  x.addOrderRule("PClass", false);
+	  x.addOrderRule(["First Class", "Second Class", "Third Class"], false);
       myChart.addLegend(200, 10, 380, 20, "right");
       myChart.draw();
     });
   </script>
 </div>
-
-
-<body>
-<h2>Data Visualization Insights</h2>
-
-1.	Overall, First class passengers have the highest number of survivors followed by Second and Third class respectively.	
-
-2.	In all classes, the women have better suvivability than men accross all ages.
-
-3.	Interestingly, highest number of survivors are from Southampton followed by Cherbourg and only marginal survivors from Queenstown accross all classes.
-
-4.	Hence, we can infer that there is a greater chance for female passengers from Southampton belonging to high socio-economic status to have survived the Titanic disaster
-
-</body>
-
 </html>
