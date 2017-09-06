@@ -48,4 +48,7 @@ Some more changes were done to improve the cart which was incorporated in index_
 The following changes were done:
 
 1. The chart type was now a storyboard type with the animating feature being the Age_Bucket (creating by grouping the age into defined groups in the R script).
-2. The Age_Bucket was introduce another crucial element Age, with respect to Titanic survivors and animating it helped to gain a very nice overview of the impact of Class, Sex, Count and Age factors in the survival of the Titanic passenges
+2. The Age_Bucket was introduce another crucial element Age, with respect to Titanic survivors and animating it helped to gain a very nice overview of the impact of Class, Sex, Count and Age factors in the survival of the Titanic passengers.
+
+Refences:
+dimplejs.org
