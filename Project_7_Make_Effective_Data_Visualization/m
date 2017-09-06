@@ -1,0 +1,44 @@
+---
+title: "Titanic_data_viz"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+
+```{r setup, include=FALSE}
+
+getwd()
+
+### Reading in Data
+prosper_data <- read.csv('P5_prosperLoanData.csv')
+
+#Structure of dataframe
+str(prosper_data)
+
+# Some example data
+titanic_data <- data.frame(age_mnth = 1:170)
+# Your way of doing things to compare against
+rota2$age_gr<-ifelse(rota2$age_mnth<6,rr2<-"0-5 mnths",
+                     ifelse(rota2$age_mnth>5&rota2$age_mnth<12,rr2<-"6-11 mnths",
+                            ifelse(rota2$age_mnth>11&rota2$age_mnth<24,rr2<-"12-23 mnths",
+                                   ifelse(rota2$age_mnth>23&rota2$age_mnth<60,rr2<-"24-59 mnths",
+                                          ifelse(rota2$age_mnth>59&rota2$age_mnth<167,rr2<-"5-14 yrs",
+                                                 rr2<-"adult")))))
+
+# Using cut
+rota2$age_grcut <- cut(rota2$age_mnth, 
+                       breaks = c(-Inf, 6, 12, 24, 60, 167, Inf), 
+                       labels = c("0-5 mnths", "6-11 mnths", "12-23 mnths", "24-59 mnths", "5-14 yrs", "adult"), 
+                       right = FALSE)
+
+### Reading in Data
+prosper_data <- read.csv('P5_prosperLoanData.csv')
+
+#Structure of dataframe
+str(prosper_data)
+```
+
