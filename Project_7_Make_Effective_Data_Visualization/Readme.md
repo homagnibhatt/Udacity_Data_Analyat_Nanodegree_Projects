@@ -23,6 +23,7 @@ Although the dataset is fairly cleaned, some preliminary cleaning was performed 
 **Data Visualization (dimple.js)**
 
 I decided to use solely and dimple.js as it would be sufficient for this task. I considered using multiple chart types (scatter, line chart, bubble chart, bar chart, etc.), color each line separately to test if this is a good way to visualize & stress on important point. I re-evaluated different chart type by tweaking few line of code and confirm my initial assumption, a stacked bar chart is already sufficient to dislay data characteristic. The first version is drawn from index-initial.html. This initial iteration can be viewed at index-initial.html, or below:
+
 ![First Chart](https://github.com/homagnibhatt/Udacity_Data_Analyst_Nanodegree_Projects/blob/master/Project_7_Make_Effective_Data_Visualization/initial_viz.PNG)
 
 **Feedback**
