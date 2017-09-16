@@ -36,6 +36,13 @@ titanic_data_new <-na.omit(titanic_data_new) # removing NA
 ## Subsetting for only important columns
 titanic_data_new <- titanic_data_new[,c( 2, 3, 5, 6, 10, 12)]
 
+
+# Using cut
+Age_Bucket <- cut(titanic_data_new$Age, 
+                       breaks = c(-Inf, 19, 41, 61, Inf), 
+                       labels = c("Children (0-18)", "Young (19-40)","Middle-Aged (41-60)", "Senior-Citizen   (61-above)"), 
+                       right = FALSE)
+
 head(titanic_data_new)## checking changes made
 
 # Write CSV in R
