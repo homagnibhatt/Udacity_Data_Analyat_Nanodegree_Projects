@@ -55,9 +55,7 @@ The feedback was incorporated and the final chart was drawn at [index_final.html
 **Resources**
 
 [dimple.js](http://dimplejs.org/)
+
 [Data Visualization and D3.js (Udacity)](https://in.udacity.com/course/data-visualization-and-d3js--ud507)
+
 [mbostock's blocks](https://bl.ocks.org/mbostock)
-
-**Data**
-
-train.csv: original downloaded dataset with minor cleaning for dimple.js implementation.
