@@ -1,7 +1,9 @@
-**Data Visualization: Titanic Data Visualization** #
+**Data Visualization: Titanic Data Visualization** 
+
 by Homagni Bhattacharjee, as Project 7 of Udacity's Data Analyst Nanodegree.
 
 **Summary**
+
 This project charts a storyboard stacked bar chart. It shows the following:
 1.The animating feature is the Age_Bucket (creating by grouping the age into defined groups in the R script).
 2. The chart gives a nice overview of the impact of Class, Sex, Count and Age factors in the survival of the Titanic passengers.
@@ -10,6 +12,7 @@ This project charts a storyboard stacked bar chart. It shows the following:
 **Design**
 
 **Exploratory Data Analysis and Cleaning (R)**
+
 I downloaded the data from Kaggle - Machine Learning from Disaster, selecting a train data set which already had basic finding & doesn't need extensive data wrangling or transformation.
 Although the dataset is fairly cleaned, some preliminary cleaning was performed using R. The following steps were taken:
 1.	Removing rows with NA and blank values so that a complete dataset was used.
@@ -18,10 +21,12 @@ Although the dataset is fairly cleaned, some preliminary cleaning was performed 
 4.	For this reason we only use the following variables: Survived, PClass, Sex, Age, Fare, Embarked
 
 **Data Visualization (dimple.js)**
+
 I decided to use solely and dimple.js as it would be sufficient for this task. I considered using multiple chart types (scatter, line chart, bubble chart, bar chart, etc.), color each line separately to test if this is a good way to visualize & stress on important point. I re-evaluated different chart type by tweaking few line of code and confirm my initial assumption, a stacked bar chart is already sufficient to dislay data characteristic. The first version is drawn from index-initial.html. This initial iteration can be viewed at index-initial.html, or below:
 ![First Chart](https://github.com/homagnibhatt/Udacity_Data_Analyst_Nanodegree_Projects/blob/master/Project_7_Make_Effective_Data_Visualization/initial_viz.PNG)
 
 **Feedback**
+
 I gathered feedback from 3 different people people and tried to follow Udacity questions guideline and here is the abridged responses.
 
 **Interview #1**
@@ -34,6 +39,7 @@ I gathered feedback from 3 different people people and tried to follow Udacity q
 >The second chart looks a bit weird and too much junk information, there's no need to include different age in different age bracket like that. There's not much information to show. And for the first chart, split the column into two, a stacked-bar wouldn't be necessary. Also, you also needs to clean up the headline & make clear of the axis, what is PClass? Can you makes it a bit clearer. Overall, this chart is straightforward.
 
 **Post-feedback Design**
+
 Following the feedback from the 3 interviews, I implemented the following changes:
 
 I separate man & women from the first chart.
@@ -47,9 +53,11 @@ Final rendition of the data visualization is shown below:
 ![Final Chart](https://raw.githubusercontent.com/tommyly2010/Udacity-Data-Analyst-Nanodegree/master/p6 - Data Visualization/img/image-final.png)
 
 **Resources**
+
 [dimple.js](http://dimplejs.org/)
 [Data Visualization and D3.js (Udacity)](https://in.udacity.com/course/data-visualization-and-d3js--ud507)
 [mbostock's blocks](https://bl.ocks.org/mbostock)
 
 **Data**
+
 train.csv: original downloaded dataset with minor cleaning for dimple.js implementation.
