@@ -1,0 +1,539 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+# Prosper Loan Data Analysis
+Homagni Bhattacharjee  
+========================================================
+
+```{r chunk 1, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+```
+
+
+## Introduction
+This dataset is related to the loan, borrowers, lenders, interest rates and stuffs like that. Prosper or Prosper Marketplace Inc. is a San Francisco, California based company specializing in loans at low interest rates to the borrowers.In this dataset, we are using the data from  Posper to analyse it and trying to find the pattern in the Prosper data. 
+
+For the purpose of this analysis, we are using R, a high level programming language of the analysis with some of its most popular graphic package ggplot.
+
+This data set contains 113,937 loans with 81 variables on each loan, including loan amount, borrower rate (or interest rate), current loan status, borrower income, borrower employment status, borrower credit history, and the latest payment information.
+
+
+The data is available in the CSV format and can be downloaded from [here](https://s3.amazonaws.com/udacity-hosted-downloads/ud651/prosperLoanData.csv). A detailed information of the variables is mentioned [here](https://docs.google.com/spreadsheets/d/1gDyi_L4UvIrLTEC6Wri5nbaMmkGmLQBk-Yx3z0XDEtI/edit?usp=sharing)
+
+
+Out of these variables, the following were chosen for further analysis, which are as follows:
+
+**Term** : Amount of month customers opted for loan
+
+**LoanStatus** : Current status of the loan like chargedoff, completed, defauted etc...
+
+**EstimatedEffectiveYield** : Yield of lenders from borrowers minus the processing fee and late fines
+
+**ProsperScore** : Risk Factor score from 1 to 10. 10 being least risky
+
+**BorrowerAPR** : The Borrower's Annual Percentage Rate (APR) for the loan.
+
+**BorrowerRate** : The Borrower's interest rate for this loan.
+
+**ListingCategory..numeric.** : Prosper rating for borrowers in numbers
+
+**EmploymentStatus** : Current type of employment
+
+**Occupation** : Occupation of borrower at the time of listing
+
+**EmploymentStatusDuration** : How long the employee has been employed
+
+**StatedMonthlyIncome** : Monthly income of the borrower
+
+**MonthlyLoanPayment** : Monthly loan payment amount
+
+**LoanOriginalAmount** : Original amount of the loan
+
+**LoanOriginationQuarter** : Quarter of the month when loan was originated
+
+
+### Basic exploration of the datset
+
+ Now we will subset the identified variables from the original dataset and replace the Term levels from months to years.
+
+```{r chunk 2, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+
+### Reading in Data
+prosper_data <- read.csv('P5_prosperLoanData.csv')
+
+#Structure of dataframe
+str(prosper_data)
+```
+
+
+```{r chunk 3, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+### Subsetting data
+prosper_data_EDA <- subset(prosper_data, 
+                    select = c(Term,LoanStatus,
+                               EstimatedEffectiveYield,
+                              ProsperScore,BorrowerAPR,
+                              BorrowerRate,ListingCategory..numeric.,
+                              EmploymentStatus,DebtToIncomeRatio,
+                              EmploymentStatusDuration,StatedMonthlyIncome,
+                              MonthlyLoanPayment,Recommendations,
+                              LoanOriginalAmount, LoanOriginationQuarter))
+
+## Changing Term values from Months to Years, where 1 Year= 12 months
+
+prosper_data_EDA$Term <- replace(prosper_data_EDA$Term, 
+                                 prosper_data_EDA$Term == "12",1)
+prosper_data_EDA$Term <- replace(prosper_data_EDA$Term, 
+                                 prosper_data_EDA$Term == "24",2)
+prosper_data_EDA$Term <- replace(prosper_data_EDA$Term, 
+                                 prosper_data_EDA$Term == "36",3)
+prosper_data_EDA$Term <- replace(prosper_data_EDA$Term, 
+                                 prosper_data_EDA$Term == "48",4) 
+prosper_data_EDA$Term <- replace(prosper_data_EDA$Term, 
+                                 prosper_data_EDA$Term == "60",5)
+prosper_data_EDA$Term <- replace(prosper_data_EDA$Term,
+                                 prosper_data_EDA$Term == "72",6)
+
+## Replacing Term type to int from chr
+prosper_data_EDA$Term<-as.numeric(prosper_data_EDA$Term) 
+```
+                        
+
+First we will look into the term of the loans.The first question that needs to be asked is **HOW LONG PEOPLE USUALLY OPT FOR LOAN?** Let's answer this question with a histogram
+
+We can see that people don't really loan any amount for less than one year and the most popular loan amount is of 3 years although some people do choose for 5 years. 
+
+```{r chunk 4, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+library(ggplot2)
+qplot(x=Term, data=prosper_data_EDA) +
+      scale_x_continuous(limits=c(0,6), 
+      breaks = seq(0,6,1))+
+      geom_histogram(color="black", 
+      fill="lightgreen", binwidth = 1) + 
+      ggtitle("Loans count according to Term") +
+      labs(x = "Loan Term", 
+           y = "No of borrowers") + theme_bw()
+
+```
+
+
+## Employment Status 
+Now, let us take a look at the various employment status and occupation types that the borrowers have reported.
+
+```{r chunk 5, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+# plot
+library(ggplot2)
+qplot(x=reorder(EmploymentStatus, EmploymentStatus, 
+                function(x) length(x)), 
+                data=prosper_data_EDA) +
+  coord_flip()+ 
+  ggtitle("Employment status of borrowers") +
+  labs(x = "Status of employment ", y = "No of borrowers") + 
+  theme_bw()
+```
+
+
+
+It is interesting to see the experience of the employed people and their relation with loans taken.
+
+## EmploymentStatusDuration
+
+```{r chunk 6, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+# new duration variable in terms of years
+prosper_data_EDA$EmploymentStatusDuration.new <- 
+  round((prosper_data_EDA$EmploymentStatusDuration)/12)
+
+library(ggplot2)
+library (gridExtra)
+
+p1<- ggplot(aes(x=EmploymentStatusDuration.new), 
+                     data = prosper_data_EDA) +
+     geom_histogram( color="black", fill="lightblue") + 
+     scale_x_continuous(limits= c(0,45), 
+                        breaks= seq(0,45,2)) + 
+     theme(axis.text.x = element_text(angle = 90, 
+                                      hjust = 1)) +
+     ggtitle("No of years borrowers have been employed") +
+     labs(x = "Employment duration in years",
+       y = "No of borrowers")  + 
+      coord_flip() + theme_bw() 
+
+p2<- ggplot(aes(x=1, y=EmploymentStatusDuration.new), 
+            data = prosper_data_EDA) + 
+     geom_boxplot(fill = "orange", 
+                  colour = "black") + theme_bw()
+grid.arrange( p1,p2 , nrow =1) 
+
+```
+Clearly Employment status has a huge number of outliers. There is a high number of employees who are only recently starting out, hence the median value is low.  Even though in the plot large number of outliers will remain, we will not remove it as it shows us that more experenced persons have low need for credit as they are more financially viable.
+
+## Loan Status 
+
+```{r chunk 7, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+# plot
+library(ggplot2)
+
+qplot(x=reorder(LoanStatus, LoanStatus, 
+                function(x) length(x)), 
+                data=prosper_data_EDA) +
+  coord_flip()+ 
+  ggtitle("Loan status of borrowers") +
+  labs(x = "Status of loans ", y = "No of borrowers") + 
+  theme_bw()
+```
+
+## Borrower Rate & Borrower APR
+
+```{r chunk 7a, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+
+library(ggplot2)
+library (gridExtra)
+
+p1<- ggplot(aes(x= BorrowerRate), 
+                     data = prosper_data_EDA) + 
+    geom_histogram( color="black", fill="pink")+ 
+    theme(axis.text.x = element_text(angle = 90, 
+                                     hjust = 1)) + 
+    coord_flip() + theme_bw() 
+
+p2<- ggplot(aes(x=1, y=BorrowerRate), data = prosper_data_EDA) + 
+geom_boxplot(fill = "pink", colour = "black") + theme_bw()  
+
+
+p3<- ggplot(aes(x= BorrowerAPR), 
+                     data = prosper_data_EDA) + 
+    geom_histogram( color="black", fill="pink")+ 
+    theme(axis.text.x = element_text(angle = 90, 
+                                     hjust = 1)) + 
+    coord_flip() + theme_bw() 
+
+p4<- ggplot(aes(x=1, y=BorrowerAPR), data = prosper_data_EDA) + 
+geom_boxplot(fill = "pink", colour = "black") + theme_bw()  
+
+grid.arrange( p1,p2,p3,p4 , ncol =2) 
+
+```
+
+Both these variables have very similar distribution. Very few outliers are present compared to the large number of observations and hence their effect may be ignored and dataset retained as it is.
+
+
+Now from lenders perspective, they will be looking at 
+**EstimatedEffectiveYield** as it is said to be better estimate for the lenders than the interest rate because the interest includes _processing fees_, _uncollected interest due to borrower being chargedoff_. Plus it also doesn't include _late fines_. Hence EstimatedEffectiveYield takes account for all these things and it is thus a better measure.
+
+## EstimatedEffectiveYield
+
+```{r chunk 8, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+
+library(ggplot2)
+qplot(x=EstimatedEffectiveYield, data=prosper_data_EDA)+ 
+  scale_x_continuous(limits= c(-0.1,0.4))+ 
+  geom_histogram(color="black", fill="pink")+ 
+  ggtitle("Effective yield of borrowers") +
+  labs(x = "Yield of loans  ",y = "No of borrowers")+
+  theme_bw()
+```
+
+We can see that the EstimatedEffectiveYield is multimodal. We see the most popular EstimatedEffectiveYield is around 0.3 while the mean is around 0.17 represented by the blue dotted line. The multimodal pattern shows that there are multiple EstimatedEffectiveYield that is popular. Also, some customers have negative EstimatedEffectiveYield. This may mean a lot of things. This may mean that their BorrowerRate is a lot lower than their _service fee rate_ or these customer's _uncollected interest on chargeoff_ is lot more or they just never payed the late fee and payed back the loans along with the interest always on time.
+
+
+## Further analysis
+
+We have seen that the borrowers took loans mostly of term 3 years. Let's assume something and check if it is correct or not. Here, I assume that people with better employment status take loans with longer terms and vice versa.
+
+Now let us plot Term of loans with employment status of the borrowers
+
+```{r chunk 9, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+
+ggplot(prosper_data_EDA,aes(x=factor(Term),fill=factor(EmploymentStatus))) +
+  geom_bar(position="fill")+ 
+  ggtitle("Employment status of borrowers according to term of loans") +
+  labs(x = " Term of loans  ", y = "Proportion of borrowers")+ theme_bw() 
+```
+
+It is observed from the plot that the majority of the borrowers for all terms are a combination of (Employed + Full time) levels. This is could be because these borrowers are likely to have stable incomes which provide a level of financial stability. Also, lender may find them more loan worthy due to this factor.Hence it appears that the better employment status enables the borrowers to opt for longer term loans.
+
+Now this leads to an interesting question, **WHETHER BETTER EMPLOYMENT STATUS MEANS BETTER BORROWERS** or not. For this, first let's see the distribution of LonaStatus variable.
+
+For the purpose of this exploration, let us divide the borrowers into the following types
+
+**1. Good borrowers** - Borrowers with loan status == "Current", "Completed", "FinalPaymentinProgress"
+
+**2. Bad borrowers**- All other borrowers
+
+Now let us see the distribution of these two types of borrowers as a percentage among the various employment status categories.
+
+```{r chunk 10, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+# Reclassifying loan status as good and bad type
+
+# Create a new variable, of strings
+prosper_data_EDA$LoanStatus.new <- as.character(prosper_data_EDA$LoanStatus)
+
+# replace
+prosper_data_EDA$LoanStatus.new[
+  grepl("Current",prosper_data_EDA$LoanStatus.new)]<-"Good"
+prosper_data_EDA$LoanStatus.new[
+  grepl("Completed",prosper_data_EDA$LoanStatus.new)]<-"Good"
+prosper_data_EDA$LoanStatus.new[
+  grepl("FinalPaymentInProgress",prosper_data_EDA$LoanStatus.new)]<-"Good"
+prosper_data_EDA$LoanStatus.new[
+  grepl("Defaulted",prosper_data_EDA$LoanStatus.new)]<-"Bad"
+prosper_data_EDA$LoanStatus.new[
+  grepl("Cancelled",prosper_data_EDA$LoanStatus.new)]<-"Bad"
+prosper_data_EDA$LoanStatus.new[
+  grepl("Chargedoff",prosper_data_EDA$LoanStatus.new)]<-"Bad"
+prosper_data_EDA$LoanStatus.new[
+  grepl("Past Due",prosper_data_EDA$LoanStatus.new)]<-"Bad"
+
+# create a factor variable from the new 'Occupation' variable
+prosper_data_EDA$LoanStatus.new <- as.factor(prosper_data_EDA$LoanStatus.new)
+
+
+#Plotting new loan  status with the employment status
+library(ggplot2)
+ggplot(prosper_data_EDA,aes(x=factor(EmploymentStatus),
+                            fill=factor(LoanStatus.new))) + 
+  geom_bar(position="fill") + coord_flip() +
+  ggtitle("Type of customers and their numbers accros employment status") +
+  labs(x = "Emloyment status", y = "Proportion of borrowers ")+ theme_bw()
+```
+
+It does appear from the plot that better employed people have better loan repayment status which may justify the lenders preferring such borrowers.
+
+P.S. Some borrowers have undefined EmploymentStatus which might point out to fradulent loans being given out.
+
+
+## Looking into correlations
+
+```{r chunk 10a, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+# determining correlations accross the dataset as a guide
+library(GGally)
+ggcorr(prosper_data_EDA)
+
+```
+
+## Do Lenders prefer borrowers with better Prosper Score ? 
+
+Now let's see what is the distribution of EstimatedEffectiveYield depending on the different **ProsperScore** which is a custom risk score built using historical Prosper data. The score ranges from 1-10, with 10 being the best, or lowest risk score. 
+
+This is important because we want to answer a question, i.e., 
+**IF LENDERS GET MORE EstimatedEffectiveYield IF THEY HAVE BETTER ProsperScore?**
+
+```{r chunk 11, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+
+# Convert the variable ProsperScore from a numeric to a factor variable
+prosper_data_EDA$ProsperScore <- as.factor(
+  prosper_data_EDA$ProsperScore)
+
+# Basic violin plot
+library(ggplot2)
+
+p<-ggplot(prosper_data_EDA, 
+          aes(x=ProsperScore, y=EstimatedEffectiveYield, 
+              fill=ProsperScore)) +
+  geom_violin(trim=FALSE)
+              
+p + stat_summary(fun.y=median, 
+                 geom="point", size=2, color="black")+ 
+  ggtitle("Effective yield for Prosper Score ") +
+  labs(x = "Prosper Score", y = "Effective Yield")+ theme_bw()
+
+```
+
+We can observe a trend here. Here more score for ProsperScore means better the borrower and lesser score means poor prospects from the borrowers. 
+
+We can see that for lower ProsperScore, distribution of effective yield in a lot more than the higher ProsperScore. This may mean that lenders charges a variety of interest rate from the borrower with poor prospects as compared to borrowers with better prospect. 
+We can also notice how median (represented by the black dot) is decreasing as ProsperScore is increasing. This may mean that lenders give more relaxations to borrowers with better ratings as compared to borrowers with poor rating. 
+
+**Does that mean lenders trust and like borrowers with better ProsperScore?**
+
+Let's do a little more analysis to reveal more. The reason we need more exploration on this is because EstimatedEffectiveYield includes more things such as late fine and doesn't include processing fee and others. So more EstimatedEffectiveYield for lesser ProsperScore borrowers may be due to high late fines because lesser ProsperScore borrowers are more prone to fail to repay their loan on time each month. 
+
+So, Let's see **if borrower's interest rate shows the same trend for each ProsperScore categories or not** because interest rates doesn't include late fines. 
+
+```{r chunk 12, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+# Convert the variable ProsperScore from a numeric to a factor variable
+prosper_data_EDA$ProsperScore <- as.factor(prosper_data_EDA$ProsperScore)
+
+#make two separate Boxplot of ProsperScore with _BorrowerAPR_ and _BorrowerRate_
+
+library(ggplot2)
+library(gridExtra)
+
+
+APR <- ggplot(data = prosper_data_EDA, aes(x=ProsperScore, 
+                                           y=BorrowerAPR)) + 
+             geom_boxplot(fill = "blue", colour = "black") + theme_bw() +
+  ggtitle("Annual % rate vs Prosper Score") +
+  labs(x = "Prosper Score  ",y = "Annual % rate")
+
+rate <- ggplot(data = prosper_data_EDA, aes(x=ProsperScore, 
+                                            y=BorrowerRate)) + 
+             geom_boxplot(fill = "red", colour = "black") + theme_bw() + 
+  ggtitle("Borrower rate vs Prosper Score") +
+  labs(x = "Prosper Score  ", y = "Borrower rate")
+
+#Now use grid.arrange to put them all into one figure.
+
+grid.arrange(APR, rate, ncol=2) 
+
+```
+
+We can clearly observe that for both _BorrowerAPR_ and _BorrowerRate_ which are metric for interest rates, we see a declining trend as the _ProsperScore_ is increasing. This shows that lenders charge less for all the borrowers with better ProsperScore as compared to borrowers with inferior ProsperScore. 
+
+Let us find out the prosper score for the different employment status.
+
+```{r chunk 13, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+# Convert the variable ProsperScore from a numeric to a factor variable
+prosper_data_EDA$ProsperScore <- as.factor(prosper_data_EDA$ProsperScore)
+
+library(ggplot2)
+ggplot(prosper_data_EDA,aes(factor(ProsperScore),
+                            fill=factor(EmploymentStatus))) +
+  geom_bar(position="fill")+ theme_bw() + 
+  ggtitle("Employment status of borrowers according for every Prosper Score") +
+  labs(x = "Prosper Score  ", y = "Proportion of borrowers") 
+```
+
+Again, this is a confirmation that better employment status makes for better prosper score which indicates higher credit worthiness of these borrowers.
+
+## Looking at age of borrowers
+
+We have seen before that young people tend to take more loans than their senior counterparts. This may be due the fact that as people gain experience their salary also increases and hence the lesser reason they find to opt for loans or the reason can be something different. 
+
+Lets explore it even more let's see the correlation between  experience and the
+EstimatedEffectiveYield variable that we have explored earlier. The question that we want to explore - 
+
+**DO LENDERS ASK FOR LESS INTEREST FORM THE BORROWERS WHO ARE MORE EXPERIENCED?**
+
+This can be true because people with more job experience should have more potential to replay their loan
+better because they have higher paying jobs and hence their ProsperScore would be higher. And as we have
+seen that borrowers with better prosper score pay lesser to the lenders and lenders somehow prefer them.
+
+```{r chunk 14, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+# Convert the variable ProsperScore from a numeric to a factor variable
+prosper_data_EDA$ProsperScore <- as.factor(prosper_data_EDA$ProsperScore)
+
+#plot
+library(ggplot2)
+ggplot(prosper_data_EDA, aes(y = EstimatedEffectiveYield,
+x = EmploymentStatusDuration.new,
+fill = ProsperScore,color = ProsperScore)) +
+geom_point()+
+geom_smooth(method = "lm", se = FALSE,size=1) +
+scale_color_brewer(type='seq',palette= 'Spectral',
+guide=guide_legend(title='ProsperScore'))
+
+```
+
+**Correlation of Borrower's Experience**
+As it seems from the scatter plot that the pattern seems to have no good correlation. It means our assumption was
+not correct. Borrowers with better EmploymentStatusDuration don't seem to get any special relaxation
+from lenders in terms of interest each month. This can be further confirmed by checking the Pearson's
+correlation Coefficient.
+
+## Calculating Pearson's product-moment correlation
+
+```{r chunk 15, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+cor.test(prosper_data_EDA$EmploymentStatusDuration.new, 
+         prosper_data_EDA$EstimatedEffectiveYield, method = "pearson", 
+         conf.level = 0.95)
+``` 
+
+This also says that even though the true correlation is not true and alternative hypothesis is accepted, their
+is some serious statistical evidence of significance. But if we look into the CI, it is within the range
+of -0.03 to -0.016 which is very small. Good R value is said a value < -0.3 or value > 0.3. This value is
+definitely not that large. Judging from the context latest it is not. So we can say that there is no practical
+significance. Hence we can not tell with any confirmation that More Experienced Lenders end up paying
+Less/More interest to the Lenders.
+
+
+## Are Lenders greedy ?
+
+I always wanted to do this. But from this dataset we can answer this question a lot of way. One of the way is to check if the lenders asked for money if the borrowers income was high. Let's see if the correlation is substantial.
+
+```{r chunk 16, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+
+library(ggplot2)
+
+ggplot(prosper_data_EDA, aes(x = MonthlyLoanPayment, 
+                             y = StatedMonthlyIncome)) +
+  geom_point(alpha= 0.01) +
+  ggtitle("Monthly Income vs Monthly Loan ") +
+  labs(x = "Monthly loan amount paid", y = "Monthly income") +  
+  scale_x_continuous(trans='log2') +
+  scale_y_continuous(trans='log2') + 
+  geom_smooth(se = FALSE, method = "gam", size = 1.2, 
+              formula = y ~ s(x, bs = "cs")) + 
+  theme_bw()
+```
+
+ _MonthlyLoanPayment_ with _StatedMonthlyIncome_ were plotted with both the scales are transformed in log scale. We can clearly that there is definite a strong positive correlation between monthly income and monthly loan amount.
+    
+## Are we sure that they are greedy ?
+
+Now we can see that there was definitely a strong correlation between the two variables but are we sure? Let's find the **Correlation Coefficient** to analyse it more.
+
+## Calculating Pearson's product-moment correlation
+
+```{r chunk 17, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+cor.test(prosper_data_EDA$MonthlyLoanPayment, 
+         prosper_data_EDA$StatedMonthlyIncome,
+         method = "pearson", conf.level = 0.95)
+``` 
+
+Well we can't really say that there is a strong correlation looking at the value of R which is almost 0.2. Usually it is said to be of high statistical importance if it is more than 0.3 or less than -0.3. But we can see that the value is still acceptable with somewhat positive correlation with the population Conficence Interval being more than 0. The strong t-statistics of 67.76 and small p-value shows that the statistical significance of alternative hypothesis is very strong. 
+
+## More Correlations as a plot
+
+```{r chunk 18, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, cache.path = 'cache/', fig.path='figure/'}
+
+#Omit NA values
+
+prosper_data_cleaned <-na.omit(prosper_data_EDA)
+
+my_num_data <- prosper_data_cleaned[, sapply(prosper_data_cleaned, is.numeric)]
+library (corrplot)
+x <- cor (my_num_data)
+corrplot(x, type= "upper", order = "hclust",use="pairwise.complete.obs")
+
+```
+
+As we can see, _MonthlyLoanPayment_ has strong correlation with _StatedMonthlyIncome_ and _LoanOriginalAmount_ and mild _EmploymentStatusDuration_ and _Term_. This is not surprising  as we have seen earlier that stable jobsallow for better financial condition to support loan payment.  
+
+Hence, for borrowers it would make more sense to track the Monthly income of the borrowers and the job types they hold to predict the monthly amount that the borrowers can repay.
+
+## Some Final Thoughts
+
+Let's select 3 plots from what we have discussed and elaborate them bit further.
+
+### Good Job = Good borrower ?
+
+![](E:\Documents\Data Science\UDACITY_Data Analyst Nanodegree\Core\5. Exploratory Data Analysis\10. Explore and summarize data\Capture_1.png)<!-- -->
+
+Now, we have seen that higher Prosper Score represents lower credit risk or better borrower. Now, we see that the higher scores have a trend of high % of (fulltime jobs + employed status ). This indicates that the the lenders consider better job holders to have better repayment capacity and hence better borrowwers.
+
+This assertion is borne out from the foolowing plot:
+![](E:\Documents\Data Science\UDACITY_Data Analyst Nanodegree\Core\5. Exploratory Data Analysis\10. Explore and summarize data\Capture_2.png)<!-- -->
+
+Here we can see that the better employed people have more % of borrowers with good loan status or good loan repayment status. (we may ignore others and NA category here as it is undefined). This gives credence to the aasertion.
+
+
+### Does lenders prefer borrowers with better ProsperScore ?
+
+![](E:\Documents\Data Science\UDACITY_Data Analyst Nanodegree\Core\5. Exploratory Data Analysis\10. Explore and summarize data\Capture_3.png)<!-- -->
+
+This depicts how we interest rates are affected by the Prosper Score for risk factor. As the score improves, the median interest rate shows a declining trend. This indeed proves that the lenders like to charge less from borrowers with better prosper score.
+ 
+## Reflection
+
+1. Struggles:
+      a. Large dataset which was difficult to process initially.
+      b. Many variables like _BorrowerAPR_, _BorrowerRate_, _LenderYield_, _EstimatedEffectiveYield_. have             similar meaning but not exactly the same. So it was difficult to choose right variables.
+      c. FInding out the correct variable combination for the regression model.
+      
+2. Succeses:
+      a. Managed to produce a good regression model which had good accuracy values.
+      
+3. Ideas for future:
+      a. Regression model may be improve by using _Gradient Decend_ to better approximate the slope and the            intercept of the line.
+      b. I also believe that is some information hidden inside the delinquency variables and late payment               variables in _CurrentDelinquencies, AmountDelinquent, DelinquenciesLast7Years_ etc with respect the           Monthly loan amount which can be explored further.
