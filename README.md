@@ -18,7 +18,7 @@ In this project, we will analyze the Titanic dataset and then  use the Python li
 
 This project involves Data Wrangling Openstreet map data using MongoDB to clean the data and incorporate required changes.
 
-### 5. [Explore and Summarise Data]()
+### 5. [Explore and Summarise Data](https://github.com/homagnibhatt/Udacity_Data_Analyst_Nanodegree/tree/master/Project_5_Explore_and_Summarise_Data)
 
 Using R and apply exploratory data analysis techniques to explore relationships in the Prosper loan database in one variable to multiple variables and to explore a selected data set for distributions, outliers, and anomalies.
 
