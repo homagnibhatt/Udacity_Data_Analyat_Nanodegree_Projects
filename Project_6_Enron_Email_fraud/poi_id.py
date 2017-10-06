@@ -22,41 +22,61 @@
 # 
 # ### **Exploring the dataset**
 
-# In[66]:
+# In[1]:
 
 
-#Importing modules
+#Importing necessary modules
+
 import os
 import pickle
 import sys
 import matplotlib
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+np.random.seed(42)# setting seed number
+
 from feature_format import featureFormat, targetFeatureSplit
 from pprint import pprint
 from tester import dump_classifier_and_data
 
-
-# In[25]:
-
-
-os.chdir('C:/ud120-projects-master/final_project')
+from sklearn.feature_selection import SelectKBest, f_classif
+from sklearn.grid_search import GridSearchCV
+from sklearn.pipeline import Pipeline
 
 
-# In[26]:
+from sklearn.cross_validation import train_test_split
+from feature_format import featureFormat, targetFeatureSplit
+from sklearn.model_selection import StratifiedShuffleSplit
+from time import time
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import f1_score
+from sklearn.metrics import accuracy_score
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors.nearest_centroid import NearestCentroid
+from sklearn import svm
 
 
+# In[2]:
+
+
+#Loading data
 enron_data = pickle.load(open("final_project_dataset.pkl", "r"))
+data_dict = pickle.load( open("../final_project/final_project_dataset.pkl", "r") )
 
 
-# In[27]:
+# In[3]:
 
 
 # number of people
 print "There are ", len(enron_data), "excecutives in Enron Dataset"
 
 
-# In[28]:
+# In[4]:
 
 
 # name of all the excecutives
@@ -65,27 +85,27 @@ print enron_data.keys()
 
 # There are one name that was not a person name 'THE TRAVEL AGENCY IN THE PARK'. This was an outlier.
 
-# In[29]:
+# In[5]:
 
 
 enron_data.pop('THE TRAVEL AGENCY IN THE PARK', 0)
 
 
-# In[30]:
+# In[6]:
 
 
 # number of features
 print "There are ", len(enron_data['SKILLING JEFFREY K'].keys()), "features in the Enron Dataset"
 
 
-# In[31]:
+# In[7]:
 
 
 # list of features
 print "List of features: " + "\n" + str(enron_data['SKILLING JEFFREY K'].keys())
 
 
-# In[32]:
+# In[8]:
 
 
 # count people of interest
@@ -101,7 +121,7 @@ print poi_name
 
 # Let's explore something more about those POIs.
 
-# In[33]:
+# In[9]:
 
 
 #How many data have “NaN” for their "long-term-incentives"
@@ -112,7 +132,7 @@ for entry in enron_data:
 print 'NaN data for long_term_incentives:', count_total_incentives_NaN
 
 
-# In[34]:
+# In[10]:
 
 
 #How many folks in this dataset have a 'NaN' salary? 
@@ -123,7 +143,7 @@ for entry in enron_data:
 print 'NaN for salary:', count_salary
 
 
-# In[35]:
+# In[11]:
 
 
 # Any data that all 'NaN' in main features:
@@ -132,7 +152,7 @@ for entry in enron_data:
         print entry
 
 
-# In[36]:
+# In[12]:
 
 
 enron_data['LOCKHART EUGENE E']
@@ -142,24 +162,21 @@ enron_data['LOCKHART EUGENE E']
 # 
 # Let's explore some bivariative relationship between some quantitative features from the Enron dataset.
 
-# In[37]:
+# In[13]:
 
 
-# salary vs. bonus
+# SALARY VS BONUS
 
 sys.path.append("../tools/")
 ### read in data dictionary, convert to numpy array
-data_dict = pickle.load( open("../final_project/final_project_dataset.pkl", "r") )
 features = ["salary", "bonus"]
 data = featureFormat(data_dict, features)
 
-
-### your code below
+### plot
 for point in data:
     salary = point[0]
     bonus = point[1]
     matplotlib.pyplot.scatter( salary, bonus )
-
 matplotlib.pyplot.xlabel("salary")
 matplotlib.pyplot.ylabel("bonus")
 matplotlib.pyplot.show()
@@ -167,7 +184,7 @@ matplotlib.pyplot.show()
 
 # We can see that there was an outlier that was extremely higher than the rest of the data. Let's come back to the dataset and see what was the data point.
 
-# In[38]:
+# In[14]:
 
 
 # remove NaN's and find max salary 
@@ -179,7 +196,7 @@ print "Total people with salary: " + str(len(salary_list))
 print "Maxium salary was " + str(max(salary_list))
 
 
-# In[39]:
+# In[15]:
 
 
 # find person with max salary
@@ -190,30 +207,30 @@ for entry in enron_data:
 
 # So, the outlier was the TOTAL salary and bonus. I removed it from the dataset
 
-# In[40]:
+# In[16]:
 
 
 # remove outlier from the data
 enron_data.pop('TOTAL',0)
 
 
-# In[41]:
+# In[17]:
 
 
-# mean salary
+# average salary
 print "Average salary: " + str(int(np.mean(salary_list)))
 
 
-# In[42]:
+# In[18]:
 
 
-data_dict = pickle.load( open("../final_project/final_project_dataset.pkl", "r") )
+# Replot SALARY VS BONUS after removing outlier
+
 data_dict.pop('TOTAL', 0)
 features = ["salary", "bonus"]
 data = featureFormat(data_dict, features)
 
-
-### your code below
+### plot
 for point in data:
     salary = point[0]
     bonus = point[1]
@@ -226,7 +243,7 @@ matplotlib.pyplot.show()
 
 # We would argue that there’s 4 more outliers to investigate; let's look at a couple of them. Two people made bonuses of at least 5 million dollars, and a salary of over 1 million dollars; in other words, they got richly rewarded. What are the names associated with those point? Are they POIs?
 
-# In[43]:
+# In[19]:
 
 
 # catch outliers with high salary
@@ -242,7 +259,7 @@ top_4 = sorted(outliers_salary,key=lambda x:x[1],reverse=True)[:4]
 pprint(top_4)
 
 
-# In[44]:
+# In[20]:
 
 
 # are they POIs?
@@ -256,7 +273,7 @@ for people in top_4:
 # ### 4. Features processing
 # The data has been cleaned. Next step I added a new feature. From the intuition about the data, I guessed that the more message exchanged among POIs (fraction of from_this_person_to_poi and from_poi_to_this_person to total_message) the more chance of the person is POI.
 
-# In[45]:
+# In[21]:
 
 
 def get_total_list(key1, key2):
@@ -271,21 +288,21 @@ def get_total_list(key1, key2):
     return new_list
 
 
-# In[46]:
+# In[22]:
 
 
 # get the total poi related emails:
 total_poi_emails = get_total_list('from_this_person_to_poi', 'from_poi_to_this_person')
 
 
-# In[47]:
+# In[23]:
 
 
 # get the total emails
 total_emails = get_total_list('to_messages', 'from_messages')
 
 
-# In[48]:
+# In[24]:
 
 
 def fraction_list(list1, list2):
@@ -302,14 +319,14 @@ def fraction_list(list1, list2):
     return fraction
 
 
-# In[49]:
+# In[25]:
 
 
 # get the fraction of poi emails
 fraction_poi_emails = fraction_list(total_poi_emails, total_emails)
 
 
-# In[50]:
+# In[26]:
 
 
 # add this new feature to my data
@@ -322,15 +339,14 @@ for i in enron_data:
 print 'SKILLING fraction_poi_emails: ', enron_data['SKILLING JEFFREY K']['fraction_poi_emails']
 
 
-# In[51]:
+# In[27]:
 
 
 # let's test if this feature has any correlation with POIs
 new_features_list = ['poi', 'fraction_poi_emails']
 data = featureFormat(enron_data, new_features_list)
 
-
-### your code below
+### plot
 for point in data:
     poi = point[0]
     fraction_poi_emails = point[1]
@@ -349,30 +365,35 @@ matplotlib.pyplot.show()
 # 
 # #### Original features
 
-# In[52]:
+# In[28]:
 
 
-from sklearn.cross_validation import train_test_split
-
-np.random.seed(42)
-
-from time import time
-from sklearn.metrics import precision_score
-from sklearn.metrics import recall_score
-from sklearn.metrics import f1_score
-from sklearn.metrics import accuracy_score
-from sklearn.tree import DecisionTreeClassifier
-
-# load the data
-data_dict = pickle.load(open("../final_project/final_project_dataset.pkl", "r") )
-
-# features_list
-features_list = ['poi','salary', 'from_poi_to_this_person', 'from_this_person_to_poi', 'to_messages', 'deferral_payments', 'total_payments', 'exercised_stock_options', 'bonus', 'restricted_stock', 'shared_receipt_with_poi', 'restricted_stock_deferred', 'total_stock_value', 'expenses', 'loan_advances', 'from_messages', 'other', 'director_fees', 'deferred_income', 'long_term_incentive']
+# features_list_original
+features_list = ['poi',
+                 'salary',
+                 'from_poi_to_this_person',
+                 'from_this_person_to_poi',
+                 'to_messages',
+                 'deferral_payments',
+                 'total_payments',
+                 'exercised_stock_options',
+                 'bonus',
+                 'restricted_stock',
+                 'shared_receipt_with_poi',
+                 'restricted_stock_deferred',
+                 'total_stock_value',
+                 'expenses',
+                 'loan_advances',
+                 'from_messages',
+                 'other',
+                 'director_fees',
+                 'deferred_income',
+                 'long_term_incentive']
 
 data = featureFormat(data_dict, features_list)
 labels, features = targetFeatureSplit(data)
 
-# split data inton training and testing
+# split data into training and testing
 features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.4, random_state = 42)
 
 # choose decision tree
@@ -381,12 +402,12 @@ clf = DecisionTreeClassifier()
 clf = clf.fit(features_train, labels_train)
 pred = clf.predict(features_test)
 
+#accuracy parameters
 acc = accuracy_score(labels_test, pred)
 print 'Accuracy: ' + str(acc)
 print 'Precision: ', precision_score(labels_test, pred)
 print 'Recall: ', recall_score(labels_test, pred)
 print 'Decision Tree algorithm run time: ', round(time()-t0, 3), 's'
-
 
 # list of importance features
 importances = clf.feature_importances_
@@ -398,11 +419,31 @@ for i in range(19):
 
 # #### Add new features
 
-# In[53]:
+# In[29]:
 
 
-# features_list
-features_list = ['poi','salary', 'from_poi_to_this_person', 'fraction_poi_emails', 'from_this_person_to_poi', 'to_messages', 'deferral_payments', 'total_payments', 'exercised_stock_options', 'bonus', 'restricted_stock', 'shared_receipt_with_poi', 'restricted_stock_deferred', 'total_stock_value', 'expenses', 'loan_advances', 'from_messages', 'other', 'director_fees', 'deferred_income', 'long_term_incentive']
+# features_list with new feature created (fraction_poi_emails)
+features_list = ['poi',
+                 'salary',
+                 'from_poi_to_this_person',
+                 'fraction_poi_emails',
+                 'from_this_person_to_poi',
+                 'to_messages',
+                 'deferral_payments',
+                 'total_payments',
+                 'exercised_stock_options',
+                 'bonus',
+                 'restricted_stock',
+                 'shared_receipt_with_poi',
+                 'restricted_stock_deferred',
+                 'total_stock_value',
+                 'expenses',
+                 'loan_advances',
+                 'from_messages',
+                 'other',
+                 'director_fees',
+                 'deferred_income',
+                 'long_term_incentive']
 
 data = featureFormat(enron_data, features_list)
 labels, features = targetFeatureSplit(data)
@@ -441,91 +482,220 @@ for i in range(20):
 # 
 # The chosen method was scikit learn’s SelectKBest using f_classif as scoring function. The f_classif function computes the ANOVA F-value between labels and features for classification tasks.
 # 
-# Now we have seen better accuracy value when we used the original feature set which did not incude the new feature created. In the previous case, a total of nine features had any score above 0, hence those features are chosen for next round which are are as follows:
+# Now we have seen better accuracy value when we used the original feature set which did not incude the new feature created(fraction_poi_emails). So we will start with the original feature list and then look to select best features.
 # 
-# Accuracy: 0.844827586207
-# Precision:  0.333333333333
-# Recall:  0.125
-# Decision Tree algorithm run time:  0.06 s
-# Feature Ranking: 
-# 1 feature salary (0.337437907714)
-# 2 feature from_poi_to_this_person (0.161410018553)
-# 3 feature from_this_person_to_poi (0.109563164109)
-# 4 feature to_messages (0.101688311688)
-# 5 feature deferral_payments (0.0753246753247)
-# 6 feature total_payments (0.0753246753247)
-# 7 feature exercised_stock_options (0.0564935064935)
-# 8 feature bonus (0.048961038961)
-# 9 feature restricted_stock (0.0337967018319)
 
-# In[55]:
+# In[30]:
 
 
-np.random.seed(42)
-from sklearn.feature_selection import SelectKBest, f_classif
-from sklearn.grid_search import GridSearchCV
-from sklearn.pipeline import Pipeline
+# features_list_original
+features_list = ['poi',
+                 'salary',
+                 'from_poi_to_this_person',
+                 'from_this_person_to_poi',
+                 'to_messages',
+                 'deferral_payments',
+                 'total_payments',
+                 'exercised_stock_options',
+                 'bonus',
+                 'restricted_stock',
+                 'shared_receipt_with_poi',
+                 'restricted_stock_deferred',
+                 'total_stock_value',
+                 'expenses',
+                 'loan_advances',
+                 'from_messages',
+                 'other',
+                 'director_fees',
+                 'deferred_income',
+                 'long_term_incentive']
 
-# load the data
-data_dict = pickle.load(open("../final_project/final_project_dataset.pkl", "r") )
+data = featureFormat(data_dict, features_list)
+labels, features = targetFeatureSplit(data)
 
-# features_list
-features_list = ['salary', 'from_poi_to_this_person', 'exercised_stock_options', 'bonus', 'restricted_stock',  'total_payments', 'from_this_person_to_poi', 'to_messages', 'deferral_payments']
+# split data into training and testing
+features_train, features_test, labels_train, labels_test = train_test_split(
+    features, labels, test_size = 0.4, random_state = 42)
+
+# choose decision tree
+t0 = time()
+clf = DecisionTreeClassifier()
+clf = clf.fit(features_train, labels_train)
+pred = clf.predict(features_test)
+
+#accuracy parameters
+acc = accuracy_score(labels_test, pred)
+print 'Accuracy: ' + str(acc)
+print 'Precision: ', precision_score(labels_test, pred)
+print 'Recall: ', recall_score(labels_test, pred)
+print 'Decision Tree algorithm run time: ', round(time()-t0, 3), 's'
+
+# list of importance features
+importances = clf.feature_importances_
+indices = np.argsort(importances)[::-1]
+print 'Feature Ranking: '
+for i in range(19):
+    print "{} feature {} ({})".format(i+1,features_list[i+1],importances[indices[i]])
+
+
+# Now we can see that the SelectKBest algorithm has ranked the features according to the f-score. We can see that the f-score of the features is 0.0 from sl 9-19.
+# 
+# Now to progressively narrow down the features, we will shorten the features list by stripping some features and then running it again.
+# 
+# For the next iteration we, will choose the top 15 features as ranked above. We may leave out the rest as they have 0.0 f-values.
+# 
+
+# In[31]:
+
+
+# features_list_top15
+features_list = ['poi',
+                 'salary',
+                 'from_poi_to_this_person',
+                 'from_this_person_to_poi',
+                 'to_messages',
+                 'deferral_payments',
+                 'total_payments',
+                 'exercised_stock_options',
+                 'bonus',
+                 'restricted_stock',
+                 'shared_receipt_with_poi',
+                 'restricted_stock_deferred',
+                 'total_stock_value',
+                 'expenses',
+                 'loan_advances',
+                 'from_messages']
 
 data = featureFormat(data_dict, features_list)
 labels, features = targetFeatureSplit(data)
 
 # split data into training and testing
 features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.4, random_state = 42)
-from sklearn.feature_selection import SelectKBest
-selector = SelectKBest(k='all')
-selectedFeatures = selector.fit(features,labels)
-feature_names = [features_list[i] for i in selectedFeatures.get_support(indices=True)]
-print 'Best features: ', feature_names
-
-
-# We can see most of the features here are financial features which is consistent with the nature of the of the task at hand.
-# Let's use the features and run the again the Decision Tree to see any improvement
-
-# In[56]:
-
-
-
-np.random.seed(42)
-from time import time
-from sklearn.metrics import precision_score
-from sklearn.metrics import recall_score
-
-# load the data
-data_dict = pickle.load(open("../final_project/final_project_dataset.pkl", "r") )
-
-# features_list
-features_list = ['poi','deferral_payments', 'exercised_stock_options', 'bonus', 'restricted_stock_deferred', 'total_stock_value', 'expenses', 'from_messages', 'other', 'director_fees', 'deferred_income']
-
-data = featureFormat(data_dict, features_list)
-labels, features = targetFeatureSplit(data)
-
-# split data inton training and testing
-features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.4, random_state = 42)
 
 # choose decision tree
-from sklearn.tree import DecisionTreeClassifier
 t0 = time()
 clf = DecisionTreeClassifier()
 clf = clf.fit(features_train, labels_train)
 pred = clf.predict(features_test)
 
-from sklearn.metrics import accuracy_score
+#accuracy parameters
 acc = accuracy_score(labels_test, pred)
-
 print 'Accuracy: ' + str(acc)
 print 'Precision: ', precision_score(labels_test, pred)
 print 'Recall: ', recall_score(labels_test, pred)
-print 'F1 score:', f1_score(labels_test, pred)
+print 'Decision Tree algorithm run time: ', round(time()-t0, 3), 's'
+
+# list of importance features
+importances = clf.feature_importances_
+indices = np.argsort(importances)[::-1]
+print 'Feature Ranking: '
+for i in range(15):
+    print "{} feature {} ({})".format(i+1,features_list[i+1],importances[indices[i]])
+
+
+# We can see precision, recall  values have reduced. Now, let us consider only the top 6 features which have non zero p values and try again.
+
+# In[32]:
+
+
+# features_list_top6
+features_list = ['poi',
+                 'salary',
+                 'from_poi_to_this_person',
+                 'from_this_person_to_poi',
+                 'to_messages',
+                 'deferral_payments',
+                 'total_payments']
+
+data = featureFormat(data_dict, features_list)
+labels, features = targetFeatureSplit(data)
+
+# split data into training and testing
+features_train, features_test, labels_train, labels_test = train_test_split(
+    features, labels, test_size = 0.4, random_state = 42)
+
+# choose decision tree
+t0 = time()
+clf = DecisionTreeClassifier()
+clf = clf.fit(features_train, labels_train)
+pred = clf.predict(features_test)
+
+#accuracy parameters
+acc = accuracy_score(labels_test, pred)
+print 'Accuracy: ' + str(acc)
+print 'Precision: ', precision_score(labels_test, pred)
+print 'Recall: ', recall_score(labels_test, pred)
+print 'Decision Tree algorithm run time: ', round(time()-t0, 3), 's'
+
+# list of importance features
+importances = clf.feature_importances_
+indices = np.argsort(importances)[::-1]
+print 'Feature Ranking: '
+for i in range(6):
+    print "{} feature {} ({})".format(i+1,features_list[i+1],importances[indices[i]])
+
+
+# Here,recall has improved but precision has remained static. Now, we will try to manually select features in addition to these features so that precision improves over 0.3. 
+# 
+# Now, the feature 'excercised_stock_options' is interesting. (Stock options)[http://budgeting.thenest.com/mean-exercise-stock-options-25795.html] help you to buy stocks at predetermined prices. 
+# 
+# Now, it is likely that stock options were traded as favours between 'poi' as a mulutually beneficial incentive to continue with the fraud. Hence, this feature was added to the feature list and furthur analysis is done here on.
+# 
+# Hence the feature list is increased by one to a total of seven.
+
+# In[33]:
+
+
+# features_list_manual
+
+features_list = ['poi',
+                 'salary',
+                 'from_poi_to_this_person',
+                 'from_this_person_to_poi',
+                 'to_messages',
+                 'total_payments',
+                 'deferral_payments',
+                 'exercised_stock_options',
+                 ]
+
+#'total_payments'
+#'exercised_stock_options',
+#'bonus',
+#'restricted_stock',
+#'shared_receipt_with_poi',
+#'restricted_stock_deferred',
+#'total_stock_value',
+#'expenses',
+#'loan_advances',
+#'from_messages',
+#'other',
+#'director_fees',
+#'deferred_income',
+#'long_term_incentive'
+
+
+data = featureFormat(data_dict, features_list)
+labels, features = targetFeatureSplit(data)
+
+# split data into training and testing
+features_train, features_test, labels_train, labels_test = train_test_split(
+    features, labels, test_size = 0.4, random_state = 42)
+
+# choose decision tree
+t0 = time()
+clf = DecisionTreeClassifier()
+clf = clf.fit(features_train, labels_train)
+pred = clf.predict(features_test)
+
+#accuracy parameters
+acc = accuracy_score(labels_test, pred)
+print 'Accuracy: ' + str(acc)
+print 'Precision: ', precision_score(labels_test, pred)
+print 'Recall: ', recall_score(labels_test, pred)
 print 'Decision Tree algorithm run time: ', round(time()-t0, 3), 's'
 
 
-# The selected features improved the Decision tree performance. The accuracy increased from 0.84 to 0.86, the precision and recall was much better with value of 0.5 and 0.375 respectively.
+# As we can see, we now have precision and recall values greater than 0.3 which implies that the features chosen are appropriate an may be deemed to be final feature list.
 # 
 # Since Decision Tree algorithm was used which does not need scaling, feature scaling was not used.
 # 
@@ -535,22 +705,24 @@ print 'Decision Tree algorithm run time: ', round(time()-t0, 3), 's'
 # 
 # #### Random Forest
 
-# In[57]:
+# In[34]:
 
 
-features_list = ['poi','deferral_payments', 'exercised_stock_options', 'bonus', 'restricted_stock_deferred', 'total_stock_value', 'expenses', 'from_messages', 'other', 'director_fees', 'deferred_income']
-data = featureFormat(data_dict, features_list)
-labels, features = targetFeatureSplit(data)
+features_list = ['poi',
+                 'salary',
+                 'from_poi_to_this_person',
+                 'from_this_person_to_poi',
+                 'to_messages',
+                 'total_payments',
+                 'deferral_payments',
+                 'exercised_stock_options',
+                 ]
 
-# split data inton training and testing
-features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.4, random_state = 42)
-
-from sklearn.ensemble import RandomForestClassifier
 t0 = time()
 clf = RandomForestClassifier()
 clf = clf.fit(features_train, labels_train)
 pred = clf.predict(features_test)
-from sklearn.metrics import accuracy_score
+
 acc = accuracy_score(labels_test, pred)
 print 'Accuracy: ' + str(acc)
 print 'Precision: ', precision_score(labels_test, pred)
@@ -559,19 +731,28 @@ print 'F1 score:', f1_score(labels_test, pred)
 print 'Random algorithm run time: ', round(time()-t0, 3), 's'
 
 
-# Accuracy is the same as the decision tree but recall is lower.
+# Recall and precision is 0.0. Hence, Decision Tree is preferred over Random Forest.
 # 
 # #### Adaboost
 
-# In[58]:
+# In[35]:
 
 
-from sklearn.ensemble import AdaBoostClassifier
+features_list = ['poi',
+                 'salary',
+                 'from_poi_to_this_person',
+                 'from_this_person_to_poi',
+                 'to_messages',
+                 'total_payments',
+                 'deferral_payments',
+                 'exercised_stock_options',
+                 ]
+
 t0 = time()
 clf = AdaBoostClassifier()
 clf = clf.fit(features_train, labels_train)
 pred = clf.predict(features_test)
-from sklearn.metrics import accuracy_score
+
 acc = accuracy_score(labels_test, pred)
 print 'Accuracy: ' + str(acc)
 print 'Precision: ', precision_score(labels_test, pred)
@@ -580,19 +761,28 @@ print 'F1 score:', f1_score(labels_test, pred)
 print 'Adaboost algorithm run time: ', round(time()-t0, 3), 's'
 
 
-# Comparing to decision tree, accuracy was slightly lower, recall was the same and precision was lower.
+# Recall and precision is less than 0.3. Hence, Decision Tree is preferred over Adaboost.
 # 
 # #### Logistic Regression
 
-# In[59]:
+# In[36]:
 
 
-from sklearn.linear_model import LogisticRegression
+features_list = ['poi',
+                 'salary',
+                 'from_poi_to_this_person',
+                 'from_this_person_to_poi',
+                 'to_messages',
+                 'total_payments',
+                 'deferral_payments',
+                 'exercised_stock_options',
+                 ]
+
 t0 = time()
 clf = LogisticRegression()
 clf = clf.fit(features_train, labels_train)
 pred = clf.predict(features_test)
-from sklearn.metrics import accuracy_score
+
 acc = accuracy_score(labels_test, pred)
 print 'Accuracy: ' + str(acc)
 print 'Precision: ', precision_score(labels_test, pred)
@@ -601,20 +791,28 @@ print 'F1 score:', f1_score(labels_test, pred)
 print 'Logistic regression algorithm run time: ', round(time()-t0, 3), 's'
 
 
-# Comparing to decision tree, accuracy , recall and precision was slightly lower.
-# 
+# Recall and precision is 0.0. Hence, Decision Tree is preferred over Logistic Regression.
 # 
 # #### Nearest K
 
-# In[60]:
+# In[37]:
 
 
-from sklearn.neighbors.nearest_centroid import NearestCentroid
+features_list = ['poi',
+                 'salary',
+                 'from_poi_to_this_person',
+                 'from_this_person_to_poi',
+                 'to_messages',
+                 'total_payments',
+                 'deferral_payments',
+                 'exercised_stock_options',
+                 ]
+
 t0 = time()
 clf = NearestCentroid()
 clf = clf.fit(features_train, labels_train)
 pred = clf.predict(features_test)
-from sklearn.metrics import accuracy_score
+
 acc = accuracy_score(labels_test, pred)
 print 'Accuracy: ' + str(acc)
 print 'Precision: ', precision_score(labels_test, pred)
@@ -623,19 +821,28 @@ print 'F1 score:', f1_score(labels_test, pred)
 print 'Nearest K algorithm run time: ', round(time()-t0, 3), 's'
 
 
-# Comparing to decision tree, accuracy and precision was very low but recall was higher.
+# Recall and precision is less than 0.3. Hence, Decision Tree is preferred over Nearest K.
 # 
 # #### SVC
 
-# In[61]:
+# In[38]:
 
 
-from sklearn import svm
+features_list = ['poi',
+                 'salary',
+                 'from_poi_to_this_person',
+                 'from_this_person_to_poi',
+                 'to_messages',
+                 'total_payments',
+                 'deferral_payments',
+                 'exercised_stock_options',
+                 ]
+
 t0 = time()
 clf = svm.LinearSVC()
 clf = clf.fit(features_train, labels_train)
 pred = clf.predict(features_test)
-from sklearn.metrics import accuracy_score
+
 acc = accuracy_score(labels_test, pred)
 print 'Accuracy: ' + str(acc)
 print 'Precision: ', precision_score(labels_test, pred)
@@ -644,6 +851,8 @@ print 'F1 score:', f1_score(labels_test, pred)
 print 'SVC algorithm run time: ', round(time()-t0, 3), 's'
 
 
+# Recall and precision is much lower than 0.3. Hence, Decision Tree is preferred over Random Forest.
+# 
 # After trying other algorithms, I decided to go with Decision Tree as it has the highest performance regarding overall accuracy, precision, recall and F1 score.
 # 
 # ### Tuning by GridSearchCV
@@ -658,15 +867,31 @@ print 'SVC algorithm run time: ', round(time()-t0, 3), 's'
 
 # #### Decision Tree
 
-# In[64]:
+# In[39]:
 
 
-param_grid = {'max_depth': [1, 2, 3, 4, 5],
-                  'max_features': [1, 2, 3, 4, 5, 6, 7, 8, 9]}
+# Using pipeline
+pipe = Pipeline(steps=[('classifDT', DecisionTreeClassifier())])
 
-DTC = DecisionTreeClassifier()
+#param grid
+params = [{
+    'classifDT__max_features':["sqrt","log2"],
+    'classifDT__max_depth':np.arange(3,10)
+}]
+
+#Stratified_Shuffle_Split for validation
+
+sss = StratifiedShuffleSplit(n_splits=20, test_size=0.1, train_size= None, random_state= None)
+
 # run grid search
-clf = GridSearchCV(DTC, param_grid=param_grid, scoring = 'roc_auc')
+clf = GridSearchCV(estimator=pipe, 
+                     param_grid=params, 
+                     scoring='f1',
+                     n_jobs = -1, 
+                     cv= 20,
+                     verbose = 1,
+                     error_score = 0)
+
 clf.fit(features_train, labels_train)
 
 # examine the best model
@@ -678,16 +903,14 @@ print clf.best_estimator_
 #Predicted values of new best fit classifier
 pred = clf.predict(features_test)
 
-from sklearn.metrics import accuracy_score
-acc = accuracy_score(labels_test, pred)
+
 print 'Accuracy: ' + str(acc)
 print 'Precision: ', precision_score(labels_test, pred)
 print 'Recall: ', recall_score(labels_test, pred)
 print 'Decision Tree algorithm run time: ', round(time()-t0, 3), 's'
 
 
-# The parameters ,'max_depth' and 'max_features' of DecisionTreeClassifier were tuned using GridsearchCV with the best parameters being 'max_features': 1, 'max_depth': 4.
-# 
+# The parameters ,'max_depth' and 'max_features' of DecisionTreeClassifier were tuned using GridsearchCV.
 # max_depth refers to the maximum depth of the tree. 
 # max_features refers to the number of features to consider when looking for the best split.
 # 
@@ -699,19 +922,19 @@ print 'Decision Tree algorithm run time: ', round(time()-t0, 3), 's'
 # 
 # This validation was proceeded with the following steps uing the cross validation vodule of sklearn.
 # First I used accuracy to evaluate my algorithm. It was a mistake because in this case we have a class imbalance problem - the number of POIs is small compared to the total number of examples in the dataset. 
-# So I had to use precision and recall for these activities instead. I was able to reach average value of precision and recall was much better  of 0.67 and 0.5 respectively.
+# So I had to use precision and recall for these activities instead. I was able to reach average value of precision and recall was 0.3 and 0.428 respectively.
 # 
 # Now, precision is the fraction of relevant instances among the retrieved instances, while recall is the fraction of relevant instances that have been retrieved over the total amount of relevant instances. 
 # 
 # In simple terms, high precision means that an algorithm returned substantially more relevant results than irrelevant ones, while high recall means that an algorithm returned most of the relevant results.
 # 
-# Wrt to this project, 0.3 precision means that the POI identified was correct 30% times while 0.375 recall value means the 37.5% of the POI returned are relevant.
+# Wrt to this project, 0.3 precision means that the POI identified was correct 30% times while 0.428 recall value means the 42.8% of the POI returned are relevant.
 
 # #### Saving Data
 # 
 # So finally,I would save the classifier, dataset and feature list as three pickle files (my_dataset.pkl, my_classifier.pkl, my_feature_list.pkl) respectively.
 
-# In[67]:
+# In[40]:
 
 
 ### Store to my_dataset for easy export below.
@@ -720,15 +943,15 @@ my_dataset = data_dict
 dump_classifier_and_data(clf, my_dataset, features_list)
 
 
-# In[ ]:
-
-
-
-
-
 # #### Resources
 # 
 # 1. [Sklearn documentation](http://scikit-learn.org/stable/documentation.html)
 # 2. [StackOverflow](https://stackoverflow.com/)
 # 3. [Github](https://github.com/)
 # 
+
+# In[ ]:
+
+
+
+
