@@ -13521,20 +13521,10 @@ Feature Ranking:
 <p>Now, according to the p-values obtained, the features 'salary' to 'deferral_payments' have some positive p-value. Hence, these features have significance and re included for final analysis.</p>
 <p>Apart from these features, we have the following stock-related features:
     'exercised_stock_options', 'restricted_stock', 'restricted_stock_deferred' &amp; 'total_stock_value'.
-Only the first two features have discretionary provisions which may have been traded as favour by the poi and hence they were manually selected for further analysis.</p>
+These features have discretionary provisions which may have been traded as favour by the poi and hence they were manually selected for further analysis.</p>
 <p>Also 'bonus' is a feature that may be given to those employees who have higher productivity-which may or may not be acheived by dubious means, which means that we have to keep this feature for more analysis.</p>
+<p>Also, total_payments  and shared_receipt_with_poi may frovide important clues which make them relevant.</p>
 <p>The rest of the features are generic and do not have much discretionary value attached to it and hence we will not consider them any further.</p>
-<p>So the final feature_list obtained is as follows:</p>
-<p>features_list = ['poi',
-                 'salary',
-                 'from_poi_to_this_person',
-                 'fraction_poi_emails',
-                 'from_this_person_to_poi',
-                 'to_messages',
-                 'deferral_payments',
-                 'exercised_stock_options',
-                 'bonus',
-                 'restricted_stock']</p>
 
 </div>
 </div>
