@@ -487,24 +487,14 @@ for i in range(20):
 # 
 # Apart from these features, we have the following stock-related features:
 #     'exercised_stock_options', 'restricted_stock', 'restricted_stock_deferred' & 'total_stock_value'.
-# Only the first two features have discretionary provisions which may have been traded as favour by the poi and hence they were manually selected for further analysis.
+# These features have discretionary provisions which may have been traded as favour by the poi and hence they were manually selected for further analysis.
 # 
 # Also 'bonus' is a feature that may be given to those employees who have higher productivity-which may or may not be acheived by dubious means, which means that we have to keep this feature for more analysis.
 # 
+# Also, total_payments  and shared_receipt_with_poi may frovide important clues which make them relevant.
+# 
 # The rest of the features are generic and do not have much discretionary value attached to it and hence we will not consider them any further.
 # 
-# So the final feature_list obtained is as follows:
-#                  
-# features_list = ['poi',
-#                  'salary',
-#                  'from_poi_to_this_person',
-#                  'fraction_poi_emails',
-#                  'from_this_person_to_poi',
-#                  'to_messages',
-#                  'deferral_payments',
-#                  'exercised_stock_options',
-#                  'bonus',
-#                  'restricted_stock']
 
 # In[30]:
 
@@ -517,9 +507,13 @@ features_list = ['poi',
                  'from_this_person_to_poi',
                  'to_messages',
                  'deferral_payments',
-                 'exercised_stock_options',
+                 'total_payments',
                  'bonus',
-                 'restricted_stock']
+                 'exercised_stock_options',
+                 'shared_receipt_with_poi',
+                 'restricted_stock',
+                 'total_stock_value',
+                 'restricted_stock_deferred']
 
 data = featureFormat(data_dict, features_list)
 labels, features = targetFeatureSplit(data)
@@ -555,15 +549,17 @@ print 'Decision Tree algorithm run time: ', round(time()-t0, 3), 's'
 
 
 features_list = ['poi',
-                 'salary',
                  'from_poi_to_this_person',
                  'fraction_poi_emails',
                  'from_this_person_to_poi',
                  'to_messages',
                  'deferral_payments',
-                 'exercised_stock_options',
+                 'total_payments',
                  'bonus',
-                 'restricted_stock']
+                 'exercised_stock_options',
+                 'shared_receipt_with_poi',
+                 'restricted_stock',
+                 'total_stock_value']
 
 
 data = featureFormat(data_dict, features_list)
@@ -592,15 +588,17 @@ print 'Random algorithm run time: ', round(time()-t0, 3), 's'
 
 
 features_list = ['poi',
-                 'salary',
                  'from_poi_to_this_person',
                  'fraction_poi_emails',
                  'from_this_person_to_poi',
                  'to_messages',
                  'deferral_payments',
-                 'exercised_stock_options',
+                 'total_payments',
                  'bonus',
-                 'restricted_stock']
+                 'exercised_stock_options',
+                 'shared_receipt_with_poi',
+                 'restricted_stock',
+                 'total_stock_value']
 
 
 data = featureFormat(data_dict, features_list)
@@ -629,15 +627,17 @@ print 'Adaboost algorithm run time: ', round(time()-t0, 3), 's'
 
 
 features_list = ['poi',
-                 'salary',
                  'from_poi_to_this_person',
                  'fraction_poi_emails',
                  'from_this_person_to_poi',
                  'to_messages',
                  'deferral_payments',
-                 'exercised_stock_options',
+                 'total_payments',
                  'bonus',
-                 'restricted_stock']
+                 'exercised_stock_options',
+                 'shared_receipt_with_poi',
+                 'restricted_stock',
+                 'total_stock_value']
 
 
 data = featureFormat(data_dict, features_list)
@@ -666,15 +666,17 @@ print 'Logistic regression algorithm run time: ', round(time()-t0, 3), 's'
 
 
 features_list = ['poi',
-                 'salary',
                  'from_poi_to_this_person',
                  'fraction_poi_emails',
                  'from_this_person_to_poi',
                  'to_messages',
                  'deferral_payments',
-                 'exercised_stock_options',
+                 'total_payments',
                  'bonus',
-                 'restricted_stock']
+                 'exercised_stock_options',
+                 'shared_receipt_with_poi',
+                 'restricted_stock',
+                 'total_stock_value']
 
 data = featureFormat(data_dict, features_list)
 labels, features = targetFeatureSplit(data)
@@ -702,15 +704,17 @@ print 'Nearest K algorithm run time: ', round(time()-t0, 3), 's'
 
 
 features_list = ['poi',
-                 'salary',
                  'from_poi_to_this_person',
                  'fraction_poi_emails',
                  'from_this_person_to_poi',
                  'to_messages',
                  'deferral_payments',
-                 'exercised_stock_options',
+                 'total_payments',
                  'bonus',
-                 'restricted_stock']
+                 'exercised_stock_options',
+                 'shared_receipt_with_poi',
+                 'restricted_stock',
+                 'total_stock_value']
 
 
 data = featureFormat(data_dict, features_list)
@@ -747,7 +751,7 @@ print 'SVC algorithm run time: ', round(time()-t0, 3), 's'
 
 # #### Decision Tree
 
-# In[39]:
+# In[36]:
 
 
 # Using pipeline
@@ -760,12 +764,12 @@ params = [{
 }]
 #Stratified_Shuffle_Split for validation
 
-sss = StratifiedShuffleSplit(n_splits=10, test_size=0.1, train_size= None, random_state= None)
+sss = StratifiedShuffleSplit(n_splits=10, test_size=0.1, train_size= None, random_state= 42, )
 
 # run grid search
 clf = GridSearchCV(estimator=pipe, 
                      param_grid=params, 
-                     scoring='roc_auc',
+                     scoring='f1',
                      n_jobs = -1, 
                      cv= 10,
                      verbose = 1,
@@ -795,25 +799,7 @@ print 'Decision Tree algorithm run time: ', round(time()-t0, 3), 's'
 # 
 # The parameters were tuned by running a grid with the best possible combinations for the parameters chosen and allowing the classifier to find the best fit and thus the best combination of the parametrs.
 
-# ### Analysis Validation and Performance
-# 
-# The Classifier performance, here Decision Tree classifier waqs validated by fitting the best estimator parameter set with test data which is really a subset of the training data held back from the machine learning algorithms until the very end. After we have selected and tuned the machine learning algorithms on your training dataset we can evaluate the learned models on the validation dataset to get a final objective idea of how the models might perform on unseen data, which makes validation extremely important.
-# 
-# This validation was proceeded with the following steps uing the cross validation vodule of sklearn.
-# First I used accuracy to evaluate my algorithm. It was a mistake because in this case we have a class imbalance problem - the number of POIs is small compared to the total number of examples in the dataset. 
-# So I had to use precision and recall for these activities instead. I was able to reach average value of precision and recall was 0.27 and 0.42 respectively.
-# 
-# Now, precision is the fraction of relevant instances among the retrieved instances, while recall is the fraction of relevant instances that have been retrieved over the total amount of relevant instances. 
-# 
-# In simple terms, high precision means that an algorithm returned substantially more relevant results than irrelevant ones, while high recall means that an algorithm returned most of the relevant results.
-# 
-# Wrt to this project, 0.27 precision means that the POI identified was correct 27% times while 0.42 recall value means the 42% of the POI returned are relevant.
-
-# #### Saving Data
-# 
-# So finally,I would save the classifier, dataset and feature list as three pickle files (my_dataset.pkl, my_classifier.pkl, my_feature_list.pkl) respectively.
-
-# In[40]:
+# In[37]:
 
 
 ### Store to my_dataset for easy export below.
@@ -821,6 +807,20 @@ my_dataset = data_dict
 
 dump_classifier_and_data(clf.best_estimator_, my_dataset, features_list)
 
+
+# ### Analysis Validation and Performance
+# 
+# The Classifier performance, here Decision Tree classifier waqs validated by fitting the best estimator parameter set with test data which is really a subset of the training data held back from the machine learning algorithms until the very end. After we have selected and tuned the machine learning algorithms on your training dataset we can evaluate the learned models on the validation dataset to get a final objective idea of how the models might perform on unseen data, which makes validation extremely important.
+# 
+# This validation was proceeded with the following steps uing the cross validation vodule of sklearn.
+# First I used accuracy to evaluate my algorithm. It was a mistake because in this case we have a class imbalance problem - the number of POIs is small compared to the total number of examples in the dataset. 
+# So I had to use precision and recall for these activities instead. I was able to reach value of precision and recall greater than 0.3.
+# 
+# Now, precision is the fraction of relevant instances among the retrieved instances, while recall is the fraction of relevant instances that have been retrieved over the total amount of relevant instances. 
+# 
+# In simple terms, high precision means that an algorithm returned substantially more relevant results than irrelevant ones, while high recall means that an algorithm returned most of the relevant results.
+# 
+# Wrt to this project, 0.3 cutoff for precision and recall represents 30% correct POI identified and 30% of relevant POI among the returned POI respectively.
 
 # #### Resources
 # 
