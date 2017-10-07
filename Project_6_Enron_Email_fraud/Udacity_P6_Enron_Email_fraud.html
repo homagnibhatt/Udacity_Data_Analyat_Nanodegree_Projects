@@ -13369,7 +13369,7 @@ mVmS/w990I7idXVVEgAAAABJRU5ErkJggg==
 <pre>Accuracy: 0.793103448276
 Precision:  0.142857142857
 Recall:  0.142857142857
-Decision Tree algorithm run time:  0.017 s
+Decision Tree algorithm run time:  0.015 s
 Feature Ranking: 
 1 feature salary (0.453596502238)
 2 feature from_poi_to_this_person (0.210759412118)
@@ -13479,7 +13479,7 @@ Feature Ranking:
 <pre>Accuracy: 0.758620689655
 Precision:  0.181818181818
 Recall:  0.285714285714
-Decision Tree algorithm run time:  0.02 s
+Decision Tree algorithm run time:  0.016 s
 Feature Ranking: 
 1 feature salary (0.453596502238)
 2 feature from_poi_to_this_person (0.210759412118)
@@ -13552,9 +13552,13 @@ Only the first two features have discretionary provisions which may have been tr
                  <span class="s1">&#39;from_this_person_to_poi&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;to_messages&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;deferral_payments&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;exercised_stock_options&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;total_payments&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;bonus&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;restricted_stock&#39;</span><span class="p">]</span>
+                 <span class="s1">&#39;exercised_stock_options&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;shared_receipt_with_poi&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;restricted_stock&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;total_stock_value&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;restricted_stock_deferred&#39;</span><span class="p">]</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">featureFormat</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">features_list</span><span class="p">)</span>
 <span class="n">labels</span><span class="p">,</span> <span class="n">features</span> <span class="o">=</span> <span class="n">targetFeatureSplit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -13590,9 +13594,9 @@ Only the first two features have discretionary provisions which may have been tr
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Accuracy: 0.777777777778
-Precision:  0.333333333333
-Recall:  0.714285714286
+<pre>Accuracy: 0.724137931034
+Precision:  0.0909090909091
+Recall:  0.142857142857
 Decision Tree algorithm run time:  0.016 s
 </pre>
 </div>
@@ -13619,15 +13623,17 @@ Decision Tree algorithm run time:  0.016 s
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">features_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;poi&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;salary&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;from_poi_to_this_person&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;fraction_poi_emails&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;from_this_person_to_poi&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;to_messages&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;deferral_payments&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;exercised_stock_options&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;total_payments&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;bonus&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;restricted_stock&#39;</span><span class="p">]</span>
+                 <span class="s1">&#39;exercised_stock_options&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;shared_receipt_with_poi&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;restricted_stock&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;total_stock_value&#39;</span><span class="p">]</span>
 
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">featureFormat</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">features_list</span><span class="p">)</span>
@@ -13664,11 +13670,11 @@ Decision Tree algorithm run time:  0.016 s
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Accuracy: 0.851851851852
-Precision:  0.0
-Recall:  0.0
-F1 score: 0.0
-Random algorithm run time:  0.137 s
+<pre>Accuracy: 0.862068965517
+Precision:  0.333333333333
+Recall:  0.142857142857
+F1 score: 0.2
+Random algorithm run time:  0.115 s
 </pre>
 </div>
 </div>
@@ -13691,15 +13697,17 @@ Random algorithm run time:  0.137 s
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">features_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;poi&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;salary&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;from_poi_to_this_person&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;fraction_poi_emails&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;from_this_person_to_poi&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;to_messages&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;deferral_payments&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;exercised_stock_options&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;total_payments&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;bonus&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;restricted_stock&#39;</span><span class="p">]</span>
+                 <span class="s1">&#39;exercised_stock_options&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;shared_receipt_with_poi&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;restricted_stock&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;total_stock_value&#39;</span><span class="p">]</span>
 
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">featureFormat</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">features_list</span><span class="p">)</span>
@@ -13736,11 +13744,11 @@ Random algorithm run time:  0.137 s
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Accuracy: 0.796296296296
-Precision:  0.25
+<pre>Accuracy: 0.844827586207
+Precision:  0.333333333333
 Recall:  0.285714285714
-F1 score: 0.266666666667
-Adaboost algorithm run time:  0.472 s
+F1 score: 0.307692307692
+Adaboost algorithm run time:  0.512 s
 </pre>
 </div>
 </div>
@@ -13763,15 +13771,17 @@ Adaboost algorithm run time:  0.472 s
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">features_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;poi&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;salary&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;from_poi_to_this_person&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;fraction_poi_emails&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;from_this_person_to_poi&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;to_messages&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;deferral_payments&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;exercised_stock_options&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;total_payments&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;bonus&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;restricted_stock&#39;</span><span class="p">]</span>
+                 <span class="s1">&#39;exercised_stock_options&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;shared_receipt_with_poi&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;restricted_stock&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;total_stock_value&#39;</span><span class="p">]</span>
 
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">featureFormat</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">features_list</span><span class="p">)</span>
@@ -13808,11 +13818,11 @@ Adaboost algorithm run time:  0.472 s
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Accuracy: 0.740740740741
-Precision:  0.181818181818
+<pre>Accuracy: 0.844827586207
+Precision:  0.333333333333
 Recall:  0.285714285714
-F1 score: 0.222222222222
-Logistic regression algorithm run time:  0.02 s
+F1 score: 0.307692307692
+Logistic regression algorithm run time:  0.027 s
 </pre>
 </div>
 </div>
@@ -13835,15 +13845,17 @@ Logistic regression algorithm run time:  0.02 s
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">features_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;poi&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;salary&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;from_poi_to_this_person&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;fraction_poi_emails&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;from_this_person_to_poi&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;to_messages&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;deferral_payments&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;exercised_stock_options&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;total_payments&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;bonus&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;restricted_stock&#39;</span><span class="p">]</span>
+                 <span class="s1">&#39;exercised_stock_options&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;shared_receipt_with_poi&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;restricted_stock&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;total_stock_value&#39;</span><span class="p">]</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">featureFormat</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">features_list</span><span class="p">)</span>
 <span class="n">labels</span><span class="p">,</span> <span class="n">features</span> <span class="o">=</span> <span class="n">targetFeatureSplit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -13879,11 +13891,11 @@ Logistic regression algorithm run time:  0.02 s
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Accuracy: 0.87037037037
+<pre>Accuracy: 0.879310344828
 Precision:  0.5
 Recall:  0.428571428571
 F1 score: 0.461538461538
-Nearest K algorithm run time:  0.021 s
+Nearest K algorithm run time:  0.025 s
 </pre>
 </div>
 </div>
@@ -13906,15 +13918,17 @@ Nearest K algorithm run time:  0.021 s
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">features_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;poi&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;salary&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;from_poi_to_this_person&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;fraction_poi_emails&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;from_this_person_to_poi&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;to_messages&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;deferral_payments&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;exercised_stock_options&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;total_payments&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;bonus&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;restricted_stock&#39;</span><span class="p">]</span>
+                 <span class="s1">&#39;exercised_stock_options&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;shared_receipt_with_poi&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;restricted_stock&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;total_stock_value&#39;</span><span class="p">]</span>
 
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">featureFormat</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">features_list</span><span class="p">)</span>
@@ -13951,11 +13965,11 @@ Nearest K algorithm run time:  0.021 s
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Accuracy: 0.648148148148
-Precision:  0.2
-Recall:  0.571428571429
-F1 score: 0.296296296296
-SVC algorithm run time:  0.026 s
+<pre>Accuracy: 0.413793103448
+Precision:  0.153846153846
+Recall:  0.857142857143
+F1 score: 0.260869565217
+SVC algorithm run time:  0.029 s
 </pre>
 </div>
 </div>
@@ -13987,7 +14001,7 @@ SVC algorithm run time:  0.026 s
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[39]:</div>
+<div class="prompt input_prompt">In&nbsp;[36]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Using pipeline</span>
@@ -14000,12 +14014,12 @@ SVC algorithm run time:  0.026 s
 <span class="p">}]</span>
 <span class="c1">#Stratified_Shuffle_Split for validation</span>
 
-<span class="n">sss</span> <span class="o">=</span> <span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">train_size</span><span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span> <span class="bp">None</span><span class="p">)</span>
+<span class="n">sss</span> <span class="o">=</span> <span class="n">StratifiedShuffleSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">train_size</span><span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span> <span class="mi">42</span><span class="p">,</span> <span class="p">)</span>
 
 <span class="c1"># run grid search</span>
 <span class="n">clf</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">pipe</span><span class="p">,</span> 
                      <span class="n">param_grid</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> 
-                     <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;roc_auc&#39;</span><span class="p">,</span>
+                     <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;f1&#39;</span><span class="p">,</span>
                      <span class="n">n_jobs</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> 
                      <span class="n">cv</span><span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
                      <span class="n">verbose</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -14054,8 +14068,8 @@ SVC algorithm run time:  0.026 s
 
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>[Parallel(n_jobs=-1)]: Done  42 tasks      | elapsed:    4.9s
-[Parallel(n_jobs=-1)]: Done 192 tasks      | elapsed:    9.9s
+<pre>[Parallel(n_jobs=-1)]: Done  42 tasks      | elapsed:    4.6s
+[Parallel(n_jobs=-1)]: Done 192 tasks      | elapsed:    9.5s
 </pre>
 </div>
 </div>
@@ -14067,19 +14081,19 @@ SVC algorithm run time:  0.026 s
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>*******Final results*********
-0.674352019289
-{&#39;classifDT__max_features&#39;: &#39;log2&#39;, &#39;classifDT__max_depth&#39;: 8}
+0.492156862745
+{&#39;classifDT__max_features&#39;: &#39;log2&#39;, &#39;classifDT__max_depth&#39;: 9}
 Pipeline(memory=None,
-     steps=[(&#39;classifDT&#39;, DecisionTreeClassifier(class_weight=None, criterion=&#39;gini&#39;, max_depth=8,
+     steps=[(&#39;classifDT&#39;, DecisionTreeClassifier(class_weight=None, criterion=&#39;gini&#39;, max_depth=9,
             max_features=&#39;log2&#39;, max_leaf_nodes=None,
             min_impurity_decrease=0.0, min_impurity_split=None,
             min_samples_leaf=1, min_samples_split=2,
             min_weight_fraction_leaf=0.0, presort=False, random_state=None,
             splitter=&#39;best&#39;))])
-Accuracy: 0.648148148148
-Precision:  0.272727272727
+Accuracy: 0.413793103448
+Precision:  0.230769230769
 Recall:  0.428571428571
-Decision Tree algorithm run time:  202.854 s
+Decision Tree algorithm run time:  14.284 s
 </pre>
 </div>
 </div>
@@ -14090,7 +14104,7 @@ Decision Tree algorithm run time:  202.854 s
 
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>[Parallel(n_jobs=-1)]: Done 200 out of 200 | elapsed:   10.1s finished
+<pre>[Parallel(n_jobs=-1)]: Done 200 out of 200 | elapsed:    9.7s finished
 </pre>
 </div>
 </div>
@@ -14111,33 +14125,9 @@ max_features refers to the number of features to consider when looking for the b
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Analysis-Validation-and-Performance">Analysis Validation and Performance<a class="anchor-link" href="#Analysis-Validation-and-Performance">&#194;&#182;</a></h3><p>The Classifier performance, here Decision Tree classifier waqs validated by fitting the best estimator parameter set with test data which is really a subset of the training data held back from the machine learning algorithms until the very end. After we have selected and tuned the machine learning algorithms on your training dataset we can evaluate the learned models on the validation dataset to get a final objective idea of how the models might perform on unseen data, which makes validation extremely important.</p>
-<p>This validation was proceeded with the following steps uing the cross validation vodule of sklearn.
-First I used accuracy to evaluate my algorithm. It was a mistake because in this case we have a class imbalance problem - the number of POIs is small compared to the total number of examples in the dataset. 
-So I had to use precision and recall for these activities instead. I was able to reach average value of precision and recall was 0.27 and 0.42 respectively.</p>
-<p>Now, precision is the fraction of relevant instances among the retrieved instances, while recall is the fraction of relevant instances that have been retrieved over the total amount of relevant instances.</p>
-<p>In simple terms, high precision means that an algorithm returned substantially more relevant results than irrelevant ones, while high recall means that an algorithm returned most of the relevant results.</p>
-<p>Wrt to this project, 0.27 precision means that the POI identified was correct 27% times while 0.42 recall value means the 42% of the POI returned are relevant.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Saving-Data">Saving Data<a class="anchor-link" href="#Saving-Data">&#194;&#182;</a></h4><p>So finally,I would save the classifier, dataset and feature list as three pickle files (my_dataset.pkl, my_classifier.pkl, my_feature_list.pkl) respectively.</p>
-
-</div>
-</div>
-</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[40]:</div>
+<div class="prompt input_prompt">In&nbsp;[37]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1">### Store to my_dataset for easy export below.</span>
@@ -14150,6 +14140,21 @@ So I had to use precision and recall for these activities instead. I was able to
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Analysis-Validation-and-Performance">Analysis Validation and Performance<a class="anchor-link" href="#Analysis-Validation-and-Performance">&#194;&#182;</a></h3><p>The Classifier performance, here Decision Tree classifier waqs validated by fitting the best estimator parameter set with test data which is really a subset of the training data held back from the machine learning algorithms until the very end. After we have selected and tuned the machine learning algorithms on your training dataset we can evaluate the learned models on the validation dataset to get a final objective idea of how the models might perform on unseen data, which makes validation extremely important.</p>
+<p>This validation was proceeded with the following steps uing the cross validation vodule of sklearn.
+First I used accuracy to evaluate my algorithm. It was a mistake because in this case we have a class imbalance problem - the number of POIs is small compared to the total number of examples in the dataset. 
+So I had to use precision and recall for these activities instead. I was able to reach value of precision and recall greater than 0.3.</p>
+<p>Now, precision is the fraction of relevant instances among the retrieved instances, while recall is the fraction of relevant instances that have been retrieved over the total amount of relevant instances.</p>
+<p>In simple terms, high precision means that an algorithm returned substantially more relevant results than irrelevant ones, while high recall means that an algorithm returned most of the relevant results.</p>
+<p>Wrt to this project, 0.3 cutoff for precision and recall represents 30% correct POI identified and 30% of relevant POI among the returned POI respectively.</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
