@@ -1,7 +1,4 @@
-
-# coding: utf-8
-
-# # **Udacity Data Analyst Nanodegree**
+## # **Udacity Data Analyst Nanodegree**
 # 
 # ## **Project 6: Identify Fraud from Enron Email**
 # 
@@ -27,39 +24,7 @@
 
 #Importing necessary modules
 
-import os
-import pickle
-import sys
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
-np.random.seed(42)# setting seed number
-
-from feature_format import featureFormat, targetFeatureSplit
-from pprint import pprint
-from tester import dump_classifier_and_data
-
-from sklearn.feature_selection import SelectKBest, f_classif
-from sklearn.grid_search import GridSearchCV
-from sklearn.pipeline import Pipeline
-
-
-from sklearn.cross_validation import train_test_split
-from feature_format import featureFormat, targetFeatureSplit
-from sklearn.model_selection import StratifiedShuffleSplit
-from time import time
-from sklearn.metrics import precision_score
-from sklearn.metrics import recall_score
-from sklearn.metrics import f1_score
-from sklearn.metrics import accuracy_score
-
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.neighbors.nearest_centroid import NearestCentroid
-from sklearn.naive_bayes import GaussianNB
-from sklearn import svm
+-
 
 
 # In[2]:
@@ -409,13 +374,6 @@ print 'Precision: ', precision_score(labels_test, pred)
 print 'Recall: ', recall_score(labels_test, pred)
 print 'Decision Tree algorithm run time: ', round(time()-t0, 3), 's'
 
-# list of importance features
-importances = clf.feature_importances_
-indices = np.argsort(importances)[::-1]
-print 'Feature Ranking: '
-for i in range(19):
-    print "{} feature {} ({})".format(i+1,features_list[i+1],importances[indices[i]])
-
 
 # #### Add new features
 
@@ -465,41 +423,18 @@ print 'Recall: ', recall_score(labels_test, pred)
 print 'Decision Tree algorithm run time: ', round(time()-t0, 3), 's'
 
 
-# list of importance features
-importances = clf.feature_importances_
-indices = np.argsort(importances)[::-1]
-print 'Feature Ranking: '
-for i in range(20):
-    print "{} feature {} ({})".format(i+1,features_list[i+1],importances[indices[i]])
-
 
 # The new feature improved recall and precision. So, I decided to use the new feature henceforth.
 # 
 # #### Intelligently Select Features
 # 
-# The next step is selecting the features that convey the most information to our model. Leaving some features out has some advantages, like reducing the noise in the classification, and saving processing time, since there are less features to compute. Now have the following features to choose from :
+# The next step is selecting the features that convey the most information to our model. Leaving some features out has some advantages, like reducing the noise in the classification, and saving processing time, since there are less features to compute. 
 # 
-# ['poi','salary','from_poi_to_this_person','fraction_poi_emails','from_this_person_to_poi','to_messages','deferral_payments',
-#   'total_payments','exercised_stock_options','bonus','restricted_stock','shared_receipt_with_poi',   'restricted_stock_deferred','total_stock_value','expenses','loan_advances', 'from_messages','other','director_fees',
-#   'deferred_income', 'long_term_incentive']
-#   
-# Now, according to the p-values obtained, the features 'salary' to 'deferral_payments' have some positive p-value. Hence, these features have significance and re included for final analysis.
-# 
-# Apart from these features, we have the following stock-related features:
-#     'exercised_stock_options', 'restricted_stock', 'restricted_stock_deferred' & 'total_stock_value'.
-# These features have discretionary provisions which may have been traded as favour by the poi and hence they were manually selected for further analysis.
-# 
-# Also 'bonus' is a feature that may be given to those employees who have higher productivity-which may or may not be acheived by dubious means, which means that we have to keep this feature for more analysis.
-# 
-# Also, total_payments  and shared_receipt_with_poi may frovide important clues which make them relevant.
-# 
-# The rest of the features are generic and do not have much discretionary value attached to it and hence we will not consider them any further.
-# 
+# Now, we use RFE to select the best features and use them further in our analysis.
 
-# In[30]:
+# In[39]:
 
 
-# features_list with new feature created (fraction_poi_emails)
 features_list = ['poi',
                  'salary',
                  'from_poi_to_this_person',
@@ -508,12 +443,98 @@ features_list = ['poi',
                  'to_messages',
                  'deferral_payments',
                  'total_payments',
-                 'bonus',
                  'exercised_stock_options',
-                 'shared_receipt_with_poi',
+                 'bonus',
                  'restricted_stock',
+                 'shared_receipt_with_poi',
+                 'restricted_stock_deferred',
                  'total_stock_value',
-                 'restricted_stock_deferred']
+                 'expenses',
+                 'loan_advances',
+                 'from_messages',
+                 'other',
+                 'director_fees',
+                 'deferred_income',
+                 'long_term_incentive']
+
+data = featureFormat(data_dict, features_list)
+labels, features = targetFeatureSplit(data)
+
+# split data into training and testing
+features_train, features_test, labels_train, labels_test = train_test_split(
+    features, labels, test_size = 0.4, random_state = 42)
+
+X, y = (features_train, labels_train)
+
+# Create the RFE object and compute a cross-validated score.
+DTC = DecisionTreeClassifier()
+
+rfecv = RFECV(estimator=DTC, step=1, cv=StratifiedKFold(2),
+              scoring = 'average_precision')
+rfecv.fit(X, y)
+
+print("Optimal number of features : %d" % rfecv.n_features_)
+
+# Plot number of features VS. cross-validation scores
+plt.figure()
+plt.xlabel("Number of features selected")
+plt.ylabel("Cross validation score (nb of correct classifications)")
+plt.plot(range(1, len(rfecv.grid_scores_) + 1), rfecv.grid_scores_)
+plt.show()
+
+
+# In[40]:
+
+
+# Using RFE to identify best 3 features as it is the optimal feature mix
+
+features_list = ['poi',
+                 'salary',
+                 'from_poi_to_this_person',
+                 'fraction_poi_emails',
+                 'from_this_person_to_poi',
+                 'to_messages',
+                 'deferral_payments',
+                 'total_payments',
+                 'exercised_stock_options',
+                 'bonus',
+                 'restricted_stock',
+                 'shared_receipt_with_poi',
+                 'restricted_stock_deferred',
+                 'total_stock_value',
+                 'expenses',
+                 'loan_advances',
+                 'from_messages',
+                 'other',
+                 'director_fees',
+                 'deferred_income',
+                 'long_term_incentive']
+
+data = featureFormat(data_dict, features_list)
+labels, features = targetFeatureSplit(data)
+
+# split data into training and testing
+features_train, features_test, labels_train, labels_test = train_test_split(
+    features, labels, test_size = 0.4, random_state = 42)
+
+# feature extraction
+model =  DecisionTreeClassifier()
+rfe = RFE(model, 3)
+fit = rfe.fit(features_train, labels_train)
+print("Num Features: %d") % fit.n_features_
+print("Selected Features: %s") % fit.support_
+print("Feature Ranking: %s") % fit.ranking_
+
+
+# In[42]:
+
+
+# Updated_features_list_as_per_RFE
+
+features_list = ['poi',
+                 'fraction_poi_emails',
+                 'total_payments',
+                 'exercised_stock_options']
 
 data = featureFormat(data_dict, features_list)
 labels, features = targetFeatureSplit(data)
@@ -535,210 +556,15 @@ print 'Recall: ', recall_score(labels_test, pred)
 print 'Decision Tree algorithm run time: ', round(time()-t0, 3), 's'
 
 
-# As we can see, we now have precision and recall values greater than 0.3 which implies that the features chosen are appropriate an may be deemed to be final feature list.
+
 # 
 # Since Decision Tree algorithm was used which does not need scaling, feature scaling was not used.
 # 
 # 
 # ### Algorithm Selection and Tuning
-# I have tried Decision tree. With the small samples like that Naive Bayes may not work very well. So, let's try Random Forest, Adaboost and NearestK.
-# 
-# #### Random Forest
-
-# In[31]:
+# Decision Tree was used in the final analysis. For simplicity and fater running, only decision tree is reatited in this file
 
 
-features_list = ['poi',
-                 'from_poi_to_this_person',
-                 'fraction_poi_emails',
-                 'from_this_person_to_poi',
-                 'to_messages',
-                 'deferral_payments',
-                 'total_payments',
-                 'bonus',
-                 'exercised_stock_options',
-                 'shared_receipt_with_poi',
-                 'restricted_stock',
-                 'total_stock_value']
-
-
-data = featureFormat(data_dict, features_list)
-labels, features = targetFeatureSplit(data)
-
-# split data into training and testing
-features_train, features_test, labels_train, labels_test = train_test_split(
-    features, labels, test_size = 0.4, random_state = 42)
-
-t0 = time()
-clf = RandomForestClassifier()
-clf = clf.fit(features_train, labels_train)
-pred = clf.predict(features_test)
-
-acc = accuracy_score(labels_test, pred)
-print 'Accuracy: ' + str(acc)
-print 'Precision: ', precision_score(labels_test, pred)
-print 'Recall: ', recall_score(labels_test, pred)
-print 'F1 score:', f1_score(labels_test, pred)
-print 'Random algorithm run time: ', round(time()-t0, 3), 's'
-
-
-# #### Adaboost
-
-# In[32]:
-
-
-features_list = ['poi',
-                 'from_poi_to_this_person',
-                 'fraction_poi_emails',
-                 'from_this_person_to_poi',
-                 'to_messages',
-                 'deferral_payments',
-                 'total_payments',
-                 'bonus',
-                 'exercised_stock_options',
-                 'shared_receipt_with_poi',
-                 'restricted_stock',
-                 'total_stock_value']
-
-
-data = featureFormat(data_dict, features_list)
-labels, features = targetFeatureSplit(data)
-
-# split data into training and testing
-features_train, features_test, labels_train, labels_test = train_test_split(
-    features, labels, test_size = 0.4, random_state = 42)
-
-t0 = time()
-clf = AdaBoostClassifier()
-clf = clf.fit(features_train, labels_train)
-pred = clf.predict(features_test)
-
-acc = accuracy_score(labels_test, pred)
-print 'Accuracy: ' + str(acc)
-print 'Precision: ', precision_score(labels_test, pred)
-print 'Recall: ', recall_score(labels_test, pred)
-print 'F1 score:', f1_score(labels_test, pred)
-print 'Adaboost algorithm run time: ', round(time()-t0, 3), 's'
-
-
-# #### Logistic Regression
-
-# In[33]:
-
-
-features_list = ['poi',
-                 'from_poi_to_this_person',
-                 'fraction_poi_emails',
-                 'from_this_person_to_poi',
-                 'to_messages',
-                 'deferral_payments',
-                 'total_payments',
-                 'bonus',
-                 'exercised_stock_options',
-                 'shared_receipt_with_poi',
-                 'restricted_stock',
-                 'total_stock_value']
-
-
-data = featureFormat(data_dict, features_list)
-labels, features = targetFeatureSplit(data)
-
-# split data into training and testing
-features_train, features_test, labels_train, labels_test = train_test_split(
-    features, labels, test_size = 0.4, random_state = 42)
-
-t0 = time()
-clf = LogisticRegression()
-clf = clf.fit(features_train, labels_train)
-pred = clf.predict(features_test)
-
-acc = accuracy_score(labels_test, pred)
-print 'Accuracy: ' + str(acc)
-print 'Precision: ', precision_score(labels_test, pred)
-print 'Recall: ', recall_score(labels_test, pred)
-print 'F1 score:', f1_score(labels_test, pred)
-print 'Logistic regression algorithm run time: ', round(time()-t0, 3), 's'
-
-
-# #### Nearest K
-
-# In[34]:
-
-
-features_list = ['poi',
-                 'from_poi_to_this_person',
-                 'fraction_poi_emails',
-                 'from_this_person_to_poi',
-                 'to_messages',
-                 'deferral_payments',
-                 'total_payments',
-                 'bonus',
-                 'exercised_stock_options',
-                 'shared_receipt_with_poi',
-                 'restricted_stock',
-                 'total_stock_value']
-
-data = featureFormat(data_dict, features_list)
-labels, features = targetFeatureSplit(data)
-
-# split data into training and testing
-features_train, features_test, labels_train, labels_test = train_test_split(
-    features, labels, test_size = 0.4, random_state = 42)
-
-t0 = time()
-clf = NearestCentroid()
-clf = clf.fit(features_train, labels_train)
-pred = clf.predict(features_test)
-
-acc = accuracy_score(labels_test, pred)
-print 'Accuracy: ' + str(acc)
-print 'Precision: ', precision_score(labels_test, pred)
-print 'Recall: ', recall_score(labels_test, pred)
-print 'F1 score:', f1_score(labels_test, pred)
-print 'Nearest K algorithm run time: ', round(time()-t0, 3), 's'
-
-
-# #### SVC
-
-# In[35]:
-
-
-features_list = ['poi',
-                 'from_poi_to_this_person',
-                 'fraction_poi_emails',
-                 'from_this_person_to_poi',
-                 'to_messages',
-                 'deferral_payments',
-                 'total_payments',
-                 'bonus',
-                 'exercised_stock_options',
-                 'shared_receipt_with_poi',
-                 'restricted_stock',
-                 'total_stock_value']
-
-
-data = featureFormat(data_dict, features_list)
-labels, features = targetFeatureSplit(data)
-
-# split data into training and testing
-features_train, features_test, labels_train, labels_test = train_test_split(
-    features, labels, test_size = 0.4, random_state = 42)
-
-t0 = time()
-clf = svm.LinearSVC()
-clf = clf.fit(features_train, labels_train)
-pred = clf.predict(features_test)
-
-acc = accuracy_score(labels_test, pred)
-print 'Accuracy: ' + str(acc)
-print 'Precision: ', precision_score(labels_test, pred)
-print 'Recall: ', recall_score(labels_test, pred)
-print 'F1 score:', f1_score(labels_test, pred)
-print 'SVC algorithm run time: ', round(time()-t0, 3), 's'
-
-
-# After trying other algorithms, I decided to go with Decision Tree as it has the highest performance regarding overall accuracy, precision, recall and F1 score.
-# 
 # ### Tuning by GridSearchCV
 # 
 # The ultimate goal of machine learning is to make a machine system that can automatically build models from data without requiring tedious and time consuming human involvement. 
@@ -751,7 +577,7 @@ print 'SVC algorithm run time: ', round(time()-t0, 3), 's'
 
 # #### Decision Tree
 
-# In[36]:
+# In[47]:
 
 
 # Using pipeline
@@ -764,14 +590,14 @@ params = [{
 }]
 #Stratified_Shuffle_Split for validation
 
-sss = StratifiedShuffleSplit(n_splits=10, test_size=0.1, train_size= None, random_state= 42, )
+sss = StratifiedShuffleSplit(n_splits=50, test_size=0.1, train_size= None, random_state= 42, )
 
 # run grid search
 clf = GridSearchCV(estimator=pipe, 
                      param_grid=params, 
                      scoring='f1',
                      n_jobs = -1, 
-                     cv= 10,
+                     cv= 50,
                      verbose = 1,
                      error_score = 0)
 
@@ -799,7 +625,7 @@ print 'Decision Tree algorithm run time: ', round(time()-t0, 3), 's'
 # 
 # The parameters were tuned by running a grid with the best possible combinations for the parameters chosen and allowing the classifier to find the best fit and thus the best combination of the parametrs.
 
-# In[37]:
+# In[48]:
 
 
 ### Store to my_dataset for easy export below.
@@ -828,9 +654,5 @@ dump_classifier_and_data(clf.best_estimator_, my_dataset, features_list)
 # 2. [StackOverflow](https://stackoverflow.com/)
 # 3. [Github](https://github.com/)
 # 
-
-# In[ ]:
-
-
 
 
